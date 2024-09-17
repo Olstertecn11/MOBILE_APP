@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Box, FormControl, Input, Stack, Button, Link, useToast, HStack, Text, IconButton, CloseIcon } from 'native-base';
+import { login } from '../services/auth';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -27,8 +28,10 @@ const LoginScreen = () => {
     });
   };
 
-  const handleLogin = () => {
+  const handleLogin = async() => {
     if (user.username === 'admin' && user.password === 'admin') {
+      const response = await login(user);
+      console.log(response);
       showCustomToast('Inicio de sesión exitoso', 'green.500');
       setTimeout(() => {
         navigation.navigate('Home');
