@@ -93,6 +93,17 @@ const CustomDrawerContent = (props) => {
           <Icon name="cart" size={20} color="green" style={{ marginRight: 10 }} />
           <Text color="green.800" fontSize="md">Ingresar Pedido</Text>
         </Pressable>
+        <Pressable
+          onPress={() => props.navigation.navigate('Dashboard')}
+          bg="green.200"
+          p={3}
+          rounded="md"
+          flexDirection="row"
+          alignItems="center"
+        >
+          <Icon name="cart" size={20} color="green" style={{ marginRight: 10 }} />
+          <Text color="green.800" fontSize="md">Dashboard</Text>
+        </Pressable>
       </VStack>
 
       <Box p={4} mt={4}>
