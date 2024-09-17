@@ -28,6 +28,11 @@ const CustomDrawerContent = (props) => {
           <Text>Home</Text>
         </Pressable>
       </VStack>
+      <VStack space={4} px={4}>
+        <Pressable onPress={() => props.navigation.navigate('IngInventario')}>
+          <Text>Ingresar Inventario</Text>
+        </Pressable>
+      </VStack>
 
       <Box p={4} mt={4}>
         <Button colorScheme="green" onPress={() => alert('Logging Off')}>
