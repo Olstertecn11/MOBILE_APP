@@ -69,7 +69,17 @@ const CustomDrawerContent = (props) => {
           <Icon name="person" size={20} color="green" style={{ marginRight: 10 }} />
           <Text color="green.800" fontSize="md">Ingresar Usuario</Text>
         </Pressable>
-
+        <Pressable
+          onPress={() => props.navigation.navigate('VerUsuarios')}
+          bg="green.200"
+          p={3}
+          rounded="md"
+          flexDirection="row"
+          alignItems="center"
+        >
+          <Icon name="person" size={20} color="green" style={{ marginRight: 10 }} />
+          <Text color="green.800" fontSize="md">Ver Usuarios</Text>
+        </Pressable>
         <Pressable
           onPress={() => props.navigation.navigate('IngCliente')}
           bg="green.200"

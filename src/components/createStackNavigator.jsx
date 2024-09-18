@@ -12,6 +12,7 @@ import IngCliente from '../screens/IngCliente';
 import IngPedido from '../screens/IngPedido';
 import VerCliente from '../screens/VerCliente';
 import Dashboard from '../screens/Dashboard';
+import VerUsuarios from '../screens/VerUsuarios';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -21,6 +22,7 @@ const DrawerNavigator = () => (
     <Drawer.Screen name="Home" component={HomeScreen} options={{ title: 'Inicio' }} />
     <Drawer.Screen name="IngInventario" component={IngInventario} options={{ title: 'Ingresar Inventario' }} />
     <Drawer.Screen name="IngUsuario" component={IngUsuario} options={{ title: 'Ingresar Usuario' }} />
+    <Drawer.Screen name="VerUsuarios" component={VerUsuarios} options={{ title: 'Ver Usuarios' }} />
     <Drawer.Screen name="IngCliente" component={IngCliente} options={{ title: 'Ingresar Cliente' }} />
     <Drawer.Screen name="VerCliente" component={VerCliente} options={{ title: 'Ver Clientes' }} />
     <Drawer.Screen name="IngPedido" component={IngPedido} options={{ title: 'Ingresar Pedido' }} />

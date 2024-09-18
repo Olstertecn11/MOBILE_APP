@@ -1,9 +1,57 @@
+
 import React, { useState } from 'react';
-import { VStack, FormControl, Input, Button, Select, CheckIcon, Center, Box, Text } from 'native-base';
+import { VStack, FormControl, Input, Button, Select, CheckIcon, Center, Box, Text, useToast } from 'native-base';
+import { createUser } from '../services/user';
 
 const IngUsuario = () => {
   const [nombre, setNombre] = useState('');
   const [rol, setRol] = useState('');
+  const [loading, setLoading] = useState(false);
+  const toast = useToast();
+
+  const handleAgregarUsuario = async () => {
+    if (!nombre || !rol) {
+      toast.show({
+        description: "Todos los campos son obligatorios",
+        bgColor: "red.500",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const userData = {
+        username: nombre,
+        password: 'defaultPassword',
+        role_id: rol === 'admin' ? 1 : 2,
+        email: `${nombre.toLowerCase().replace(' ', '.')}@example.com`,
+      };
+
+      const response = await createUser(userData);
+      console.log(response);
+      if (response.status === 201) {
+        toast.show({
+          description: "Usuario creado exitosamente",
+          bgColor: "green.500",
+        });
+        setNombre('');
+        setRol('');
+      } else {
+        toast.show({
+          description: "Error al crear usuario",
+          bgColor: "red.500",
+        });
+      }
+    } catch (error) {
+      toast.show({
+        description: "Error al crear usuario",
+        bgColor: "red.500",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Center h={'100%'} px="2" bg="#ECFFE6">
@@ -41,7 +89,12 @@ const IngUsuario = () => {
             </Select>
           </FormControl>
 
-          <Button mt="2" colorScheme="green" onPress={() => console.log(nombre, rol)}>
+          <Button
+            mt="2"
+            colorScheme="green"
+            isLoading={loading}
+            onPress={handleAgregarUsuario}
+          >
             Agregar usuario
           </Button>
         </VStack>
@@ -51,3 +104,4 @@ const IngUsuario = () => {
 };
 
 export default IngUsuario;
+
