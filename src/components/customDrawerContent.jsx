@@ -4,8 +4,20 @@ import { Box, Text, VStack, Pressable, HStack, Avatar, Button } from 'native-bas
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/Ionicons';
 import myicon from '../assets/profile.png'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const CustomDrawerContent = (props) => {
+
+  const navigation = useNavigation();
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('user');
+    await AsyncStorage.removeItem('token');
+    navigation.navigate('Login');
+  };
+
+
   return (
     <DrawerContentScrollView {...props}>
       <Box bg="green.100" p={4} mb={2}>
@@ -109,7 +121,7 @@ const CustomDrawerContent = (props) => {
       <Box p={4} mt={4}>
         <Button
           colorScheme="green"
-          onPress={() => alert('Logging Off')}
+          onPress={handleLogout}
           leftIcon={<Icon name="log-out" size={20} color="white" />}
         >
           Log Off

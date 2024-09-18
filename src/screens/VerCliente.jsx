@@ -1,36 +1,57 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, Input, VStack, HStack, Text, FlatList } from 'native-base';
+import { getAllclient } from '../services/client';
 
 const VerCliente = () => {
-  const [clients, setClients] = useState([
-    {
-      id: 1,
-      nombre: 'Luis Franco',
-      direccion: '1 av 3-7',
-      telefono: '22334567',
-      vendedor: 'José Perez',
-    },
-    {
-      id: 2,
-      nombre: 'José Perez',
-      direccion: '1 av 3-7',
-      telefono: '22334567',
-      vendedor: 'Sin vendedor asignado',
-    },
-  ]);
-
+  const [clients, setClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await getAllclient();
+        console.log(response.data);
+        if (response.status == 200) {
+          setClients(response.data);
+        } else {
+          setError('Error fetching clients');
+        }
+      } catch (err) {
+        setError('Error fetching clients');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchClients();
+  }, []);
 
   const handleModifyClient = () => {
-    // Modify client logic
     console.log('Modify client:', selectedClient);
   };
 
   const handleDeleteClient = () => {
-    // Delete client logic
     console.log('Delete client:', selectedClient);
   };
+
+  if (loading) {
+    return (
+      <Box flex={1} bg="#ECFFE6" alignItems="center" justifyContent="center">
+        <Text>Cargando clientes...</Text>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box flex={1} bg="#ECFFE6" alignItems="center" justifyContent="center">
+        <Text color="red.500">{error}</Text>
+      </Box>
+    );
+  }
 
   return (
     <Box flex={1} bg="#ECFFE6" p={4} alignItems="center">
@@ -52,10 +73,10 @@ const VerCliente = () => {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <HStack justifyContent="space-between" p={2} borderBottomWidth={1} borderBottomColor="gray.200">
-              <Text flex={1}>{item.nombre}</Text>
-              <Text flex={1}>{item.direccion}</Text>
-              <Text flex={1}>{item.telefono}</Text>
-              <Text flex={1}>{item.vendedor}</Text>
+              <Text flex={1}>{item.name}</Text>
+              <Text flex={1}>{item.address}</Text>
+              <Text flex={1}>{item.phone}</Text>
+              <Text flex={1}>{item.assigned_seller || 'Sin vendedor asignado'}</Text>
             </HStack>
           )}
         />
@@ -95,3 +116,4 @@ const VerCliente = () => {
 };
 
 export default VerCliente;
+

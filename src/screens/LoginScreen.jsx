@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Box, FormControl, Input, Stack, Button, Link, useToast, HStack, Text, IconButton, CloseIcon } from 'native-base';
 import { login } from '../services/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
@@ -11,8 +12,8 @@ const LoginScreen = () => {
 
   const showCustomToast = (message, bgColor) => {
     toast.show({
-      placement: "top-right", // Colocar en la esquina superior derecha
-      duration: 3000, // Duración del toast
+      placement: "top-right",
+      duration: 3000,
       render: () => {
         return (
           <Box bg={bgColor} px="4" py="2" rounded="md" mb={5}>
@@ -28,16 +29,26 @@ const LoginScreen = () => {
     });
   };
 
-  const handleLogin = async() => {
-    if (user.username === 'admin' && user.password === 'admin') {
+  const handleLogin = async () => {
+    try {
       const response = await login(user);
-      console.log(response);
-      showCustomToast('Inicio de sesión exitoso', 'green.500');
-      setTimeout(() => {
-        navigation.navigate('Home');
-      }, 1000);
-    } else {
-      showCustomToast('Usuario o contraseña incorrectos', 'red.500');
+      if (response.status === 200) {
+        const userData = response.data.user;
+        const token = response.data.token;
+
+        await AsyncStorage.setItem('user', JSON.stringify(userData));
+        await AsyncStorage.setItem('token', token);
+        showCustomToast('Inicio de sesión exitoso', 'green.500');
+        setUser(initialUserState);
+        setTimeout(() => {
+          navigation.navigate('Home');
+        }, 1000);
+      } else {
+        setUser(initialUserState);
+        showCustomToast('Usuario o contraseña incorrectos', 'red.500');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
     }
   };
 
@@ -46,7 +57,7 @@ const LoginScreen = () => {
       <FormControl isRequired>
         <Stack mx="4">
           <FormControl.Label>Usuario</FormControl.Label>
-          <Input 
+          <Input
             value={user.username}
             onChangeText={(value) => setUser((prev) => ({ ...prev, username: value }))}
             _light={{
@@ -92,11 +103,11 @@ const LoginScreen = () => {
         </Stack>
       </FormControl>
 
-      <Button 
-        bg={'#389618'} 
-        marginLeft={4} 
-        marginRight={4} 
-        marginTop={6} 
+      <Button
+        bg={'#389618'}
+        marginLeft={4}
+        marginRight={4}
+        marginTop={6}
         onPress={handleLogin}
       >
         Entrar
