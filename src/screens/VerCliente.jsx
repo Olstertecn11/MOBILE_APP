@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Input, VStack, HStack, Text, FlatList } from 'native-base';
 import { getAllclient } from '../services/client';
+import { useIsFocused } from '@react-navigation/native';
 
 const VerCliente = () => {
   const [clients, setClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -26,8 +28,8 @@ const VerCliente = () => {
       }
     };
 
-    fetchClients();
-  }, []);
+    if (isFocused) fetchClients();
+  }, [isFocused]);
 
   const handleModifyClient = () => {
     console.log('Modify client:', selectedClient);

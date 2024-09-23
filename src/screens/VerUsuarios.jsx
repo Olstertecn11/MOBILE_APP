@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Input, VStack, HStack, Text, FlatList, useToast } from 'native-base';
 import { getAllusers } from '../services/user';
+import { useIsFocused } from '@react-navigation/native';
 
 const VerUsuarios = () => {
   const [users, setUsers] = useState([]);
@@ -9,6 +10,7 @@ const VerUsuarios = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const toast = useToast();
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -29,8 +31,8 @@ const VerUsuarios = () => {
       }
     };
 
-    fetchUsers();
-  }, []);
+    if (isFocused) fetchUsers();
+  }, [isFocused]);
 
   const handleModifyUser = () => {
     console.log('Modify user:', selectedUser);
