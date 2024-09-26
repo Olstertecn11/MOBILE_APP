@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Box, FormControl, Input, Stack, Button, Link, useToast, HStack, Text, IconButton, CloseIcon } from 'native-base';
@@ -8,6 +9,7 @@ const LoginScreen = () => {
   const navigation = useNavigation();
   const initialUserState = { username: '', password: '' };
   const [user, setUser] = useState(initialUserState);
+  const [showPassword, setShowPassword] = useState(false); // Estado para mostrar/ocultar contraseña
   const toast = useToast(); // Hook para manejar los toasts
 
   const showCustomToast = (message, bgColor) => {
@@ -94,11 +96,16 @@ const LoginScreen = () => {
               _focus: { bg: "coolGray.900:alpha.70" }
             }}
             shadow={2}
-            type="password"
+            type={showPassword ? "text" : "password"} // Mostrar como texto o como contraseña
             placeholder="********"
           />
-          <Link alignSelf="flex-end" colorScheme="green" mt={2}>
-            Recuperar contraseña
+          <Link
+            alignSelf="flex-end"
+            colorScheme="green"
+            mt={2}
+            onPress={() => setShowPassword(!showPassword)} // Alternar mostrar/ocultar contraseña
+          >
+            {showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
           </Link>
         </Stack>
       </FormControl>
@@ -112,8 +119,12 @@ const LoginScreen = () => {
       >
         Entrar
       </Button>
+      <Link alignSelf="flex-end" colorScheme="green" mt={2} mr={4}>
+        Recuperar contraseña
+      </Link>
     </Box>
   );
 };
 
 export default LoginScreen;
+
