@@ -4,13 +4,19 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Drawer } from 'expo-router/drawer';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import LoginScreen from './Login';
 
 export default function Layout() {
   const router = useRouter();
+  const isLogged = false;
 
   const handleLogout = () => {
     router.replace('/Login');
   };
+
+  if (!isLogged) {
+    return <LoginScreen />
+  }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
