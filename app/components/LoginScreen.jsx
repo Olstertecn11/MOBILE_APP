@@ -16,7 +16,6 @@ export default function LoginScreen() {
     else {
       alert("Contraseña incorrecta");
     }
-    // await AsyncStorage.setItem('userSession', 'true');
   };
 
   return (
