@@ -69,11 +69,9 @@ const IngCliente = () => {
   };
 
   return (
-    <Box flex={1} bg="#ECFFE6" alignItems="center" justifyContent="center">
+    <Box flex={1} bg="#ECFFE6" alignItems="center" paddingTop={10} >
       <VStack space={4} alignItems="center" w="80%">
-
         <Text fontSize="lg" bold mb="4">Agregar cliente</Text>
-
         <Input
           variant="filled"
           placeholder="Dirección"
