@@ -53,6 +53,14 @@ export default function Layout() {
           options={{ title: 'Agregar Usuario' }}
         />
         <Drawer.Screen
+          name="AddClient"
+          options={{ title: 'Agregar Cliente' }}
+        />
+        <Drawer.Screen
+          name="AddProduct"
+          options={{ title: 'Agregar Producto' }}
+        />
+        <Drawer.Screen
           name="AddOrder"
           options={{ title: 'Agregar Pedido' }}
         />
