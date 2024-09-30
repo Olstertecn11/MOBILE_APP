@@ -1,122 +1,101 @@
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Box, Text, FormControl, Input, Stack, Button, useToast, HStack, IconButton, CloseIcon, Spinner, Center } from 'native-base';
+import { login } from '../../services/auth';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const toast = useToast();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const showCustomToast = (message, bgColor) => {
+    toast.show({
+      placement: "top-right",
+      duration: 3000,
+      render: () => (
+        <Box bg={bgColor} px="4" py="2" rounded="md" mb={5}>
+          <HStack space={2} justifyContent="space-between" alignItems="center">
+            <Text color="white" fontWeight="bold">{message}</Text>
+            <IconButton icon={<CloseIcon size="xs" color="white" />} onPress={() => toast.closeAll()} />
+          </HStack>
+        </Box>
+      ),
+    });
+  };
 
   const handleLogin = async () => {
-    if (username === 'olster' && password === 'daniela11') {
-      router.replace('/Home');
-    } else {
-      alert("Contraseña incorrecta");
-    }
+    setLoading(true);
+    setTimeout(() => {
+      if (username === 'olster' && password === 'daniela11') {
+        showCustomToast('Sesión Iniciada', 'green.500');
+        setLoading(false);
+        setTimeout(() => {
+          router.replace('/Home');
+        }, 1000);
+      } else {
+        showCustomToast('Credenciales Incorrectas', 'red.500');
+        setLoading(false);
+      }
+    }, 2000);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+    <Box flex={1} justifyContent="center" alignItems="center" bg="#efffe0" paddingX={4}>
+      <Text fontSize="3xl" fontWeight="bold" mb={5}>
+        Login
+      </Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Usuario"
-        value={username}
-        onChangeText={(text) => setUsername(text)}
-      />
+      <FormControl isRequired w="80%" mb={4}>
+        <Stack>
+          <FormControl.Label>Usuario</FormControl.Label>
+          <Input
+            placeholder="Usuario"
+            value={username}
+            onChangeText={text => setUsername(text)}
+            isDisabled={loading}
+          />
+        </Stack>
+      </FormControl>
 
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={[styles.input, { flex: 1 }]}
-          placeholder="Contraseña"
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-          secureTextEntry={!showPassword}
-        />
-      </View>
+      <FormControl isRequired w="80%" mb={1}>
+        <Stack>
+          <FormControl.Label>Contraseña</FormControl.Label>
+          <Input
+            placeholder="Contraseña"
+            value={password}
+            onChangeText={text => setPassword(text)}
+            type={showPassword ? 'text' : 'password'}
+            isDisabled={loading}
+          />
+        </Stack>
+      </FormControl>
 
-      <TouchableOpacity
-        onPress={() => setShowPassword(!showPassword)}
-        style={styles.showPasswordButton}
-      >
-        <Text style={styles.showPasswordText}>
+      <Button variant="link" onPress={() => setShowPassword(!showPassword)} alignSelf="flex-end" mr="10%" mb={1} isDisabled={loading}>
+        <Text color="green.500">
           {showPassword ? 'Ocultar Contraseña' : 'Ver Contraseña'}
         </Text>
-      </TouchableOpacity>
+      </Button>
 
-      {/* Botón de ingresar */}
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Ingresar</Text>
-      </TouchableOpacity>
+      {loading ? (
+        <Center>
+          <Spinner size="lg" color="green.500" />
+        </Center>
+      ) : (
+        <>
+          <Button w="80%" mb={4} colorScheme="green" onPress={handleLogin}>
+            Ingresar
+          </Button>
 
-      <TouchableOpacity style={styles.buttonSecondary}>
-        <Text style={styles.buttonText}>Olvidé mi contraseña</Text>
-      </TouchableOpacity>
-    </View>
+          <Button w="80%" variant="outline" colorScheme="green">
+            Olvidé mi contraseña
+          </Button>
+        </>
+      )}
+    </Box>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#efffe0',
-    paddingTop: '50%'
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#000000',
-  },
-  input: {
-    width: '80%',
-    height: 50,
-    borderColor: '#d3d3d3',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 5,  // Ajustado el margen para que el botón de "Ver" esté más cerca
-    paddingHorizontal: 10,
-    backgroundColor: '#ffffff',
-  },
-  passwordContainer: {
-    width: '80%',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  showPasswordButton: {
-    width: '80%',  // Para asegurarte de que ocupe el ancho del input
-    alignItems: 'flex-end',  // Alinear el texto "Ver" a la derecha
-    marginBottom: 15,  // Añadir un pequeño margen debajo
-    marginRight: 20
-  },
-  showPasswordText: {
-    color: '#4caf50',
-    fontWeight: 'bold',
-  },
-  button: {
-    width: '80%',
-    backgroundColor: '#4caf50',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  buttonSecondary: {
-    width: '80%',
-    backgroundColor: '#6fcf97',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
 
