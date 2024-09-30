@@ -16,10 +16,14 @@
       "supportsTablet": true
     },
     "android": {
+      "permissions": [
+        "INTERNET"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.ols11.APP"
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +35,11 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3b4dd459-e24d-46fe-896a-4e08139a3dd8"
+      }
     }
   }
 }

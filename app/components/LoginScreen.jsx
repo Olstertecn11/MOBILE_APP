@@ -54,6 +54,7 @@ export default function LoginScreen() {
       }
     }
     catch (error) {
+      showCustomToast(error, 'red.500');
       console.log(error);
     }
   };

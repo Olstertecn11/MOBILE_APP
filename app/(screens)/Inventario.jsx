@@ -36,15 +36,10 @@ const Inventario = () => {
       <TouchableOpacity>
         <Text style={styles.link}>Ver</Text>
       </TouchableOpacity>
-      <TouchableOpacity>
-        <Text style={styles.link}>Ver</Text>
-      </TouchableOpacity>
+
       <View style={styles.actions}>
         <TouchableOpacity>
-          <Text style={styles.modifyText}>Modificar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Text style={styles.deleteText}>Eliminar</Text>
+          <Text style={styles.modifyText}>...</Text>
         </TouchableOpacity>
       </View>
     </View>
