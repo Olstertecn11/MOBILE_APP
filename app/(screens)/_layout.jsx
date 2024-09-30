@@ -3,7 +3,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { Drawer } from 'expo-router/drawer';
 import { useNavigation } from 'expo-router';
-import { Box, Text, FormControl, Input, Stack, Button, useToast, HStack, IconButton, CloseIcon, Spinner, Center } from 'native-base';
+import { Avatar, VStack, Box, Text, FormControl, Input, Stack, Button, useToast, HStack, IconButton, CloseIcon, Spinner, Center } from 'native-base';
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
@@ -50,8 +50,12 @@ export default function Layout() {
           options={{ title: 'Agregar Pedido' }}
         />
         <Drawer.Screen
-          name="Clientes"
+          name="VerClientes"
           options={{ title: 'Clientes' }}
+        />
+        <Drawer.Screen
+          name="VerUsuarios"
+          options={{ title: 'Usuarios' }}
         />
       </Drawer>
     </GestureHandlerRootView>
@@ -61,12 +65,33 @@ export default function Layout() {
 function CustomDrawerContent(props) {
   return (
     <DrawerContentScrollView {...props}>
+      <Box p={4} bg="green.200">
+        <HStack space={3} alignItems="center">
+          <Avatar
+            size="lg"
+            source={{
+              uri: 'https://via.placeholder.com/150' // Imagen de avatar de ejemplo, cámbiala por una real
+            }}
+          />
+          <VStack>
+            <Text bold fontSize="md">Luis Franco</Text>
+            <Text color="gray.500" fontSize="sm">@lfranco</Text>
+          </VStack>
+        </HStack>
+      </Box>
+      <DrawerItem
+        label="Cerrar Sesión"
+        onPress={props.onLogout}
+        labelStyle={{ color: 'red', fontSize: 16 }}
+      />
       <DrawerItemList {...props} />
       <DrawerItem
         label="Cerrar Sesión"
         onPress={props.onLogout}
         labelStyle={{ color: 'red', fontSize: 16 }}
       />
+
+
     </DrawerContentScrollView>
   );
 }
