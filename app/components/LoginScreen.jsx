@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Box, Text, FormControl, Input, Stack, Button, useToast, HStack, IconButton, CloseIcon, Spinner, Center } from 'native-base';
 import { login } from '../../services/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { SessionContext } from '../../context/SessionContext';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { saveSession } = useContext(SessionContext);
 
   const showCustomToast = (message, bgColor) => {
     toast.show({
@@ -35,8 +37,7 @@ export default function LoginScreen() {
       if (response.status == 200) {
         const userData = response.data.user;
         const token = response.data.token;
-        await AsyncStorage.setItem('user', JSON.stringify(userData));
-        await AsyncStorage.setItem('token', token);
+        saveSession(userData, token);
         setUsername('');
         setPassword('');
         showCustomToast('Sesión Iniciada', 'green.500');
