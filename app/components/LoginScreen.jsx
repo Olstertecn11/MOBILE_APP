@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Box, Text, FormControl, Input, Stack, Button, useToast, HStack, IconButton, CloseIcon, Spinner, Center } from 'native-base';
 import { login } from '../../services/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -29,18 +30,31 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     setLoading(true);
-    setTimeout(() => {
-      if (username === 'olster' && password === 'daniela11') {
+    try {
+      const response = await login({ username, password });
+      if (response.status == 200) {
+        const userData = response.data.user;
+        const token = response.data.token;
+        await AsyncStorage.setItem('user', JSON.stringify(userData));
+        await AsyncStorage.setItem('token', token);
+        setUsername('');
+        setPassword('');
         showCustomToast('Sesión Iniciada', 'green.500');
-        setLoading(false);
         setTimeout(() => {
           router.replace('/Home');
+          setLoading(false);
         }, 1000);
-      } else {
+      }
+      else {
+        setUsername('');
+        setPassword('');
         showCustomToast('Credenciales Incorrectas', 'red.500');
         setLoading(false);
       }
-    }, 2000);
+    }
+    catch (error) {
+      console.log(error);
+    }
   };
 
   return (
