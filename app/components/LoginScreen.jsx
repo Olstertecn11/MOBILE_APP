@@ -8,12 +8,12 @@ export default function LoginScreen() {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
     if (username === 'olster' && password === 'daniela11') {
-      router.replace('/screens/Home');
-    }
-    else {
+      router.replace('/Home');
+    } else {
       alert("Contraseña incorrecta");
     }
   };
@@ -28,14 +28,27 @@ export default function LoginScreen() {
         value={username}
         onChangeText={(text) => setUsername(text)}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
-        value={password}
-        onChangeText={(text) => setPassword(text)}
-        secureTextEntry
-      />
 
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={[styles.input, { flex: 1 }]}
+          placeholder="Contraseña"
+          value={password}
+          onChangeText={(text) => setPassword(text)}
+          secureTextEntry={!showPassword}
+        />
+      </View>
+
+      <TouchableOpacity
+        onPress={() => setShowPassword(!showPassword)}
+        style={styles.showPasswordButton}
+      >
+        <Text style={styles.showPasswordText}>
+          {showPassword ? 'Ocultar Contraseña' : 'Ver Contraseña'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Botón de ingresar */}
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Ingresar</Text>
       </TouchableOpacity>
@@ -51,7 +64,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#EFFFE0',
+    backgroundColor: '#efffe0',
     paddingTop: '50%'
   },
   title: {
@@ -66,13 +79,28 @@ const styles = StyleSheet.create({
     borderColor: '#d3d3d3',
     borderWidth: 1,
     borderRadius: 5,
-    marginBottom: 15,
+    marginBottom: 5,  // Ajustado el margen para que el botón de "Ver" esté más cerca
     paddingHorizontal: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#ffffff',
+  },
+  passwordContainer: {
+    width: '80%',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  showPasswordButton: {
+    width: '80%',  // Para asegurarte de que ocupe el ancho del input
+    alignItems: 'flex-end',  // Alinear el texto "Ver" a la derecha
+    marginBottom: 15,  // Añadir un pequeño margen debajo
+    marginRight: 20
+  },
+  showPasswordText: {
+    color: '#4caf50',
+    fontWeight: 'bold',
   },
   button: {
     width: '80%',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4caf50',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
@@ -80,14 +108,15 @@ const styles = StyleSheet.create({
   },
   buttonSecondary: {
     width: '80%',
-    backgroundColor: '#6FCF97',
+    backgroundColor: '#6fcf97',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: 'bold',
   },
 });
+

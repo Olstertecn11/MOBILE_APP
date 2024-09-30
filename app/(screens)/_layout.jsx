@@ -2,12 +2,12 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { Drawer } from 'expo-router/drawer';
-import { View, Text, Pressable } from 'react-native';
 import { useNavigation } from 'expo-router';
-import { Helmet } from 'react-helmet';
 
 export default function Layout() {
   const navigation = useNavigation();
+  console.log("Rutas disponibles: ", navigation.getState().routes);
+
 
   const handleLogout = () => {
     console.log('Cerrar sesión');
@@ -16,9 +16,6 @@ export default function Layout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Helmet>
-        <title>ME ASOMBRAS.GT</title>
-      </Helmet>
       <Drawer drawerContent={(props) => <CustomDrawerContent {...props} onLogout={handleLogout} />}>
         <Drawer.Screen
           name="Home"
@@ -35,18 +32,6 @@ export default function Layout() {
         <Drawer.Screen
           name="Clientes"
           options={{ title: 'Clientes' }}
-        />
-        <Drawer.Screen
-          name="AddClient"
-          options={{ title: 'Agregar Cliente' }}
-        />
-        <Drawer.Screen
-          name="AddProduct"
-          options={{ title: 'Agregar Producto' }}
-        />
-        <Drawer.Screen
-          name="Inventario"
-          options={{ title: 'Inventario' }}
         />
       </Drawer>
     </GestureHandlerRootView>
