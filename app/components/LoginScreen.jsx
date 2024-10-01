@@ -31,9 +31,13 @@ export default function LoginScreen() {
   };
 
   const handleLogin = async () => {
+    console.log('enter here');
     setLoading(true);
     try {
+      console.log('login');
       const response = await login({ username, password });
+      console.log('waiting response...');
+      console.log(response);
       if (response.status == 200) {
         const userData = response.data.user;
         const token = response.data.token;
