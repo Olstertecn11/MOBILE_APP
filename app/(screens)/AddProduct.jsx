@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, ScrollView, Image, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system'; // Import FileSystem
 import { createProduct } from '../../services/product'; // Import the product service
 
 export default function AddProduct() {
@@ -15,7 +16,8 @@ export default function AddProduct() {
     precio: '',
     cuidados: '',
     descripcion: '',
-    imagen: null,
+    imagen: null, // This is for image URI to show preview
+    imageBase64: null, // This is for base64 string to send in API request
   });
 
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -46,7 +48,16 @@ export default function AddProduct() {
     });
 
     if (!result.canceled) {
-      setForm({ ...form, imagen: result.assets[0].uri });
+      // Set both the URI (for preview) and base64 (for API)
+      const base64Image = await FileSystem.readAsStringAsync(result.assets[0].uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      setForm({
+        ...form,
+        imagen: result.assets[0].uri, // Set image URI for preview
+        imageBase64: base64Image, // Set base64 for API submission
+      });
     }
   };
 
@@ -60,8 +71,8 @@ export default function AddProduct() {
         unit_price: form.precio,
         care_instructions: form.cuidados,
         description: form.descripcion,
-        document_url: '', // Assuming you are not uploading documents yet
-        image: form.imagen
+        document_url: '',
+        image: form.imageBase64, // Send the base64 image
       };
 
       const response = await createProduct(productData);
@@ -77,7 +88,8 @@ export default function AddProduct() {
           precio: '',
           cuidados: '',
           descripcion: '',
-          imagen: null
+          imagen: null,
+          imageBase64: null,
         });
       }
     } catch (error) {
@@ -157,7 +169,7 @@ export default function AddProduct() {
 
       {form.imagen && (
         <Image
-          source={{ uri: form.imagen }}
+          source={{ uri: form.imagen }} // Show image preview
           style={styles.imagePreview}
         />
       )}
