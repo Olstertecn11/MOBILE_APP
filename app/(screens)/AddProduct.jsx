@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, ScrollView, Image } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function AddProduct() {
   const [form, setForm] = useState({
@@ -12,7 +14,8 @@ export default function AddProduct() {
     fechaIngreso: new Date(),
     cuidados: '',
     descripcion: '',
-    imagen: '',
+    descripcion: '',
+    imagen: null,
   });
 
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -25,6 +28,28 @@ export default function AddProduct() {
     const currentDate = selectedDate || form.fechaIngreso;
     setShowDatePicker(false);
     setForm({ ...form, fechaIngreso: currentDate });
+  };
+
+  const selectImage = async () => {
+    // Request permission to access media library
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      alert('Permission to access media library is required!');
+      return;
+    }
+
+    // Launch the image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setForm({ ...form, imagen: result.assets[0].uri });
+    }
   };
 
   return (
@@ -75,7 +100,19 @@ export default function AddProduct() {
       )}
 
       <TouchableOpacity>
-        <Text style={styles.uploadText}>Subir documento</Text>
+        <Text style={styles.uploadText}>Cuidados</Text>
+      </TouchableOpacity>
+
+      <TextInput
+        style={[styles.input, { height: 100 }]}
+        placeholder="Cuidados..."
+        multiline={true}
+        numberOfLines={4}
+        value={form.cuidados}
+        onChangeText={(value) => handleInputChange('cuidados', value)}
+      />
+      <TouchableOpacity>
+        <Text style={styles.uploadText}>Descripción</Text>
       </TouchableOpacity>
 
       <TextInput
@@ -87,9 +124,16 @@ export default function AddProduct() {
         onChangeText={(value) => handleInputChange('descripcion', value)}
       />
 
-      <TouchableOpacity>
+      <TouchableOpacity onPress={selectImage}>
         <Text style={styles.uploadText}>Subir imagen</Text>
       </TouchableOpacity>
+
+      {form.imagen && (
+        <Image
+          source={{ uri: form.imagen }}
+          style={styles.imagePreview}
+        />
+      )}
 
       <TouchableOpacity style={styles.addButton}>
         <Text style={styles.buttonText}>Agregar al inventario</Text>
@@ -144,6 +188,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  imagePreview: {
+    width: 200,
+    height: 200,
+    marginTop: 15,
+    marginBottom: 15,
   },
 });
 

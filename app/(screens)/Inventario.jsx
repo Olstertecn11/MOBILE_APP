@@ -1,15 +1,19 @@
 
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput } from 'react-native';
+import { Actionsheet, useDisclose, Button } from 'native-base';
 
 const Inventario = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [sortedData, setSortedData] = useState([
-    { id: 1, nombre: 'Planta', cantidad: 1, precio: 100.0, imagen: 'Ver', cuidados: 'Ver' },
-    { id: 2, nombre: 'Planta', cantidad: 1, precio: 100.0, imagen: 'Ver', cuidados: 'Ver' },
-    { id: 3, nombre: 'Planta', cantidad: 1, precio: 100.0, imagen: 'Ver', cuidados: 'Ver' },
+    { id: 1, nombre: 'Planta', cantidad: 1, precio: 100.0, cuidados: 'Ver' },
+    { id: 2, nombre: 'Planta', cantidad: 1, precio: 100.0, cuidados: 'Ver' },
+    { id: 3, nombre: 'Planta', cantidad: 1, precio: 100.0, cuidados: 'Ver' },
   ]);
+
+  const { isOpen, onOpen, onClose } = useDisclose();
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -28,17 +32,18 @@ const Inventario = () => {
     setSortOrder(newSortOrder);
   };
 
+  const openActionsheet = (item) => {
+    setSelectedItem(item);
+    onOpen();
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.row}>
       <Text style={styles.cell}>{item.nombre}</Text>
       <Text style={styles.cell}>{item.cantidad}</Text>
       <Text style={styles.cell}>{item.precio.toFixed(2)}</Text>
-      <TouchableOpacity>
-        <Text style={styles.link}>Ver</Text>
-      </TouchableOpacity>
-
       <View style={styles.actions}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => openActionsheet(item)}>
           <Text style={styles.modifyText}>...</Text>
         </TouchableOpacity>
       </View>
@@ -54,6 +59,8 @@ const Inventario = () => {
             {sortOrder === 'asc' ? '🔼 Orden alfabético' : '🔽 Orden alfabético'}
           </Text>
         </TouchableOpacity>
+      </View>
+      <View style={styles.searchBar}>
         <TextInput
           style={styles.searchInput}
           placeholder="Buscar..."
@@ -70,12 +77,20 @@ const Inventario = () => {
             <Text style={styles.headerCell}>Nombre</Text>
             <Text style={styles.headerCell}>Cantidad</Text>
             <Text style={styles.headerCell}>Precio</Text>
-            <Text style={styles.headerCell}>Imagen</Text>
-            <Text style={styles.headerCell}>Cuidados</Text>
             <Text style={styles.headerCell}>Acciones</Text>
           </View>
         )}
       />
+
+      {/* NativeBase Actionsheet */}
+      <Actionsheet isOpen={isOpen} onClose={onClose}>
+        <Actionsheet.Content>
+          <Actionsheet.Item onPress={() => alert(`Visualizando ${selectedItem?.nombre}`)}>Visualizar</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => alert(`Editando ${selectedItem?.nombre}`)}>Editar</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => alert(`Eliminando ${selectedItem?.nombre}`)} color="red.500">Eliminar</Actionsheet.Item>
+          <Actionsheet.Item onPress={onClose}>Cancelar</Actionsheet.Item>
+        </Actionsheet.Content>
+      </Actionsheet>
     </View>
   );
 };
@@ -130,11 +145,6 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
   },
-  link: {
-    flex: 1,
-    color: '#4CAF50',
-    textAlign: 'center',
-  },
   actions: {
     flex: 1,
     flexDirection: 'row',
@@ -142,9 +152,6 @@ const styles = StyleSheet.create({
   },
   modifyText: {
     color: 'green',
-  },
-  deleteText: {
-    color: 'red',
   },
 });
 
