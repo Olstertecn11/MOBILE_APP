@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, ScrollView, Image, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
+import { createProduct } from '../../services/product'; // Import the product service
 
 export default function AddProduct() {
   const [form, setForm] = useState({
@@ -10,10 +11,9 @@ export default function AddProduct() {
     nombre: '',
     semilla: '',
     cantidad: '',
-    precio: '',
     fechaIngreso: new Date(),
+    precio: '',
     cuidados: '',
-    descripcion: '',
     descripcion: '',
     imagen: null,
   });
@@ -31,7 +31,6 @@ export default function AddProduct() {
   };
 
   const selectImage = async () => {
-    // Request permission to access media library
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permissionResult.granted) {
@@ -39,7 +38,6 @@ export default function AddProduct() {
       return;
     }
 
-    // Launch the image picker
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -49,6 +47,42 @@ export default function AddProduct() {
 
     if (!result.canceled) {
       setForm({ ...form, imagen: result.assets[0].uri });
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const productData = {
+        code: form.codigo,
+        name: form.nombre,
+        seed_type: form.semilla,
+        quantity: form.cantidad,
+        unit_price: form.precio,
+        care_instructions: form.cuidados,
+        description: form.descripcion,
+        document_url: '', // Assuming you are not uploading documents yet
+        image: form.imagen
+      };
+
+      const response = await createProduct(productData);
+      console.log(response);
+
+      if (response && response.success) {
+        Alert.alert('Success', 'Product added successfully');
+        setForm({
+          codigo: '',
+          nombre: '',
+          semilla: '',
+          cantidad: '',
+          precio: '',
+          cuidados: '',
+          descripcion: '',
+          imagen: null
+        });
+      }
+    } catch (error) {
+      Alert.alert('Error', 'There was an error adding the product');
+      console.error(error);
     }
   };
 
@@ -99,10 +133,6 @@ export default function AddProduct() {
         />
       )}
 
-      <TouchableOpacity>
-        <Text style={styles.uploadText}>Cuidados</Text>
-      </TouchableOpacity>
-
       <TextInput
         style={[styles.input, { height: 100 }]}
         placeholder="Cuidados..."
@@ -111,9 +141,6 @@ export default function AddProduct() {
         value={form.cuidados}
         onChangeText={(value) => handleInputChange('cuidados', value)}
       />
-      <TouchableOpacity>
-        <Text style={styles.uploadText}>Descripción</Text>
-      </TouchableOpacity>
 
       <TextInput
         style={[styles.input, { height: 100 }]}
@@ -135,7 +162,7 @@ export default function AddProduct() {
         />
       )}
 
-      <TouchableOpacity style={styles.addButton}>
+      <TouchableOpacity style={styles.addButton} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Agregar al inventario</Text>
       </TouchableOpacity>
     </ScrollView>
