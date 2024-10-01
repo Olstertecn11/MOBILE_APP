@@ -1,31 +1,46 @@
 
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput, Alert } from 'react-native';
 import { Actionsheet, useDisclose, Button } from 'native-base';
+import { getAllProducts } from '../../services/product'; // Import the getAllProducts service
 
 const Inventario = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
-  const [sortedData, setSortedData] = useState([
-    { id: 1, nombre: 'Planta', cantidad: 1, precio: 100.0, cuidados: 'Ver' },
-    { id: 2, nombre: 'Planta', cantidad: 1, precio: 100.0, cuidados: 'Ver' },
-    { id: 3, nombre: 'Planta', cantidad: 1, precio: 100.0, cuidados: 'Ver' },
-  ]);
-
+  const [sortedData, setSortedData] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclose();
   const [selectedItem, setSelectedItem] = useState(null);
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await getAllProducts();
+        console.log(response);
+        setSortedData(response.data);
+      } catch (error) {
+        Alert.alert('Error', 'Error fetching products');
+        console.error(error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   const handleSearch = (query) => {
     setSearchQuery(query);
+    const filteredData = sortedData.filter(item =>
+      item.name.toLowerCase().includes(query.toLowerCase())
+    );
+    setSortedData(filteredData);
   };
 
   const handleSort = () => {
     const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
     const sorted = [...sortedData].sort((a, b) => {
       if (newSortOrder === 'asc') {
-        return a.nombre.localeCompare(b.nombre);
+        return a.name.localeCompare(b.name);
       } else {
-        return b.nombre.localeCompare(a.nombre);
+        return b.name.localeCompare(a.name);
       }
     });
     setSortedData(sorted);
@@ -39,9 +54,9 @@ const Inventario = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.row}>
-      <Text style={styles.cell}>{item.nombre}</Text>
-      <Text style={styles.cell}>{item.cantidad}</Text>
-      <Text style={styles.cell}>{item.precio.toFixed(2)}</Text>
+      <Text style={styles.cell}>{item.name}</Text>
+      <Text style={styles.cell}>{item.quantity}</Text>
+      <Text style={styles.cell}>{item.unit_price}</Text>
       <View style={styles.actions}>
         <TouchableOpacity onPress={() => openActionsheet(item)}>
           <Text style={styles.modifyText}>...</Text>
@@ -82,12 +97,11 @@ const Inventario = () => {
         )}
       />
 
-      {/* NativeBase Actionsheet */}
       <Actionsheet isOpen={isOpen} onClose={onClose}>
         <Actionsheet.Content>
-          <Actionsheet.Item onPress={() => alert(`Visualizando ${selectedItem?.nombre}`)}>Visualizar</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => alert(`Editando ${selectedItem?.nombre}`)}>Editar</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => alert(`Eliminando ${selectedItem?.nombre}`)} color="red.500">Eliminar</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => alert(`Visualizando ${selectedItem?.name}`)}>Visualizar</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => alert(`Editando ${selectedItem?.name}`)}>Editar</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => alert(`Eliminando ${selectedItem?.name}`)} color="red.500">Eliminar</Actionsheet.Item>
           <Actionsheet.Item onPress={onClose}>Cancelar</Actionsheet.Item>
         </Actionsheet.Content>
       </Actionsheet>
