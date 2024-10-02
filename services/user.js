@@ -1,24 +1,22 @@
-
 import api from "./api";
 import handleRequest from '../utils/handleRequest';
 
-export const createProduct = async (productData) => {
-  return handleRequest(() => api.post('/product', productData));
+export const createUser = async (userData) => {
+  return handleRequest(() => api.post('/user', userData));
 };
 
-export const getAllProducts = async () => {
-  return handleRequest(() => api.get('/product'));
+export const getAllusers = async () => {
+  return handleRequest(() => api.get('/user'));
 };
 
-export const getProductById = async (id) => {
-  return handleRequest(() => api.get(`/product/${id}`));
+export const getUserById = async (id) => {
+  return handleRequest(() => api.get(`/user/${id}`));
 };
 
-export const updateProduct = async (id, productData) => {
-  return handleRequest(() => api.put(`/product/${id}`, productData));
+export const updateUser = async (id, userData) => {
+  return handleRequest(() => api.put(`/user/${id}`, userData));
 };
 
-export const deleteProduct = async (id) => {
-  return handleRequest(() => api.delete(`/product/${id}`));
+export const deleteUser = async (id) => {
+  return handleRequest(() => api.delete(`/user/${id}`));
 };
-

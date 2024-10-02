@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Input, VStack, HStack, Text, FlatList } from 'native-base';
 import { getAllclient } from '../../services/client';

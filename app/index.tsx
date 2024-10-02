@@ -14,7 +14,7 @@ export default function Page() {
 
       if (user !== null) {
         console.log('Session found, redirecting to /Home');
-        router.replace('/Home'); // Redirige si hay una sesión activa
+        router.replace('/Home');
       } else {
         console.log('No session found, staying on login screen');
       }
