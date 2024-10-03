@@ -9,6 +9,7 @@ const AddUser = () => {
   const [rol, setRol] = useState('');
   const [loading, setLoading] = useState(false);
   const toast = useToast();
+  console.log('add user view');
 
   const handleAgregarUsuario = async () => {
     if (!nombre || !rol) {
