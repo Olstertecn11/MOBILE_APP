@@ -83,7 +83,6 @@ const VerCliente = () => {
         />
       </Box>
 
-      {/* Input for selecting a client (just an example) */}
       <VStack space={4} mt={6} alignItems="center" w="100%">
         <Input
           variant="filled"
@@ -94,7 +93,6 @@ const VerCliente = () => {
           onChangeText={setSelectedClient}
         />
 
-        {/* Buttons for modifying or deleting client */}
         <HStack space={4} w="80%" justifyContent="center">
           <Button
             colorScheme="yellow"
