@@ -3,19 +3,20 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput, Alert } from 'react-native';
 import { Actionsheet, useDisclose, Button } from 'native-base';
 import { getAllProducts } from '../../services/product';
+import ViewProduct from '../../components/ViewProduct';
 
 const Inventario = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [sortedData, setSortedData] = useState([]);
-  const { isOpen, onOpen, onClose } = useDisclose();
   const [selectedItem, setSelectedItem] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclose();
+  const [isViewProductOpen, setIsViewProductOpen] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await getAllProducts();
-        console.log(response);
         setSortedData(response.data);
       } catch (error) {
         Alert.alert('Error', 'Error fetching products');
@@ -56,7 +57,7 @@ const Inventario = () => {
     <View style={styles.row}>
       <Text style={styles.cell}>{item.name}</Text>
       <Text style={styles.cell}>{item.quantity}</Text>
-      <Text style={styles.cell}>{item.unit_price}</Text>
+      <Text style={styles.cell}>Q {item.unit_price}</Text>
       <View style={styles.actions}>
         <TouchableOpacity onPress={() => openActionsheet(item)}>
           <Text style={styles.modifyText}>...</Text>
@@ -99,12 +100,19 @@ const Inventario = () => {
 
       <Actionsheet isOpen={isOpen} onClose={onClose}>
         <Actionsheet.Content>
-          <Actionsheet.Item onPress={() => alert(`Visualizando ${selectedItem?.name}`)}>Visualizar</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => alert(`Editando ${selectedItem?.name}`)}>Editar</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => { setIsViewProductOpen(true); onClose(); }}>Visualizar</Actionsheet.Item>
           <Actionsheet.Item onPress={() => alert(`Eliminando ${selectedItem?.name}`)} color="red.500">Eliminar</Actionsheet.Item>
           <Actionsheet.Item onPress={onClose}>Cancelar</Actionsheet.Item>
         </Actionsheet.Content>
       </Actionsheet>
+
+      {selectedItem && (
+        <ViewProduct
+          isOpen={isViewProductOpen}
+          onClose={() => setIsViewProductOpen(false)}
+          product={selectedItem}
+        />
+      )}
     </View>
   );
 };

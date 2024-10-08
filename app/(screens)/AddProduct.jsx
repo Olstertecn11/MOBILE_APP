@@ -16,8 +16,8 @@ export default function AddProduct() {
     precio: '',
     cuidados: '',
     descripcion: '',
-    imagen: null, // This is for image URI to show preview
-    imageBase64: null, // This is for base64 string to send in API request
+    imagen: null,
+    imageBase64: null,
   });
 
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -48,15 +48,14 @@ export default function AddProduct() {
     });
 
     if (!result.canceled) {
-      // Set both the URI (for preview) and base64 (for API)
       const base64Image = await FileSystem.readAsStringAsync(result.assets[0].uri, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
       setForm({
         ...form,
-        imagen: result.assets[0].uri, // Set image URI for preview
-        imageBase64: base64Image, // Set base64 for API submission
+        imagen: result.assets[0].uri,
+        imageBase64: base64Image,
       });
     }
   };
@@ -72,7 +71,7 @@ export default function AddProduct() {
         care_instructions: form.cuidados,
         description: form.descripcion,
         document_url: '',
-        image: form.imageBase64, // Send the base64 image
+        image: form.imageBase64,
       };
 
       const response = await createProduct(productData);
