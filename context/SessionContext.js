@@ -1,6 +1,7 @@
 
 import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system';
 
 export const SessionContext = createContext();
 
@@ -13,8 +14,16 @@ export const SessionProvider = ({ children }) => {
     try {
       const _user = await AsyncStorage.getItem('user');
       const _token = await AsyncStorage.getItem('token');
+
       if (_user && _token) {
-        setUser(JSON.parse(_user));
+        let parsedUser = JSON.parse(_user);
+
+        if (parsedUser.imageUri) {
+          const imageUri = parsedUser.imageUri;
+          parsedUser.image = imageUri;
+        }
+
+        setUser(parsedUser);
         setToken(_token);
       }
     } catch (error) {
@@ -24,10 +33,30 @@ export const SessionProvider = ({ children }) => {
     }
   };
 
+  const saveImageToFileSystem = async (base64Image) => {
+    try {
+      const fileUri = `${FileSystem.documentDirectory}profile_image.png`;
+      await FileSystem.writeAsStringAsync(fileUri, base64Image, { encoding: FileSystem.EncodingType.Base64 });
+      return fileUri;
+    } catch (error) {
+      console.error('Error al guardar la imagen en el sistema de archivos:', error);
+      return null;
+    }
+  };
+
   const saveSession = async (user, token) => {
     try {
-      const r1 = await AsyncStorage.setItem('user', JSON.stringify(user));
-      const r2 = await AsyncStorage.setItem('token', token);
+      let imageUri = null;
+
+      if (user.image) {
+        imageUri = await saveImageToFileSystem(user.image);
+        user.imageUri = imageUri;
+        delete user.image;
+      }
+
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+      await AsyncStorage.setItem('token', token);
+
       setUser(user);
       setToken(token);
     } catch (error) {

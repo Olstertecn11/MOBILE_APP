@@ -2,7 +2,6 @@
 const handleRequest = async (request) => {
   try {
     const response = await request();
-    console.log(response);
     return { status: response.status, data: response.data, error: null };
   } catch (error) {
     console.log(error);
