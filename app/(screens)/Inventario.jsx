@@ -13,16 +13,18 @@ const Inventario = () => {
   const { isOpen, onOpen, onClose } = useDisclose();
   const [isViewProductOpen, setIsViewProductOpen] = useState(false);
 
+
+  const fetchProducts = async () => {
+    try {
+      const response = await getAllProducts();
+      setSortedData(response.data);
+    } catch (error) {
+      Alert.alert('Error', 'Error fetching products');
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await getAllProducts();
-        setSortedData(response.data);
-      } catch (error) {
-        Alert.alert('Error', 'Error fetching products');
-        console.error(error);
-      }
-    };
 
     fetchProducts();
   }, []);
@@ -111,6 +113,7 @@ const Inventario = () => {
           isOpen={isViewProductOpen}
           onClose={() => setIsViewProductOpen(false)}
           product={selectedItem}
+          refreshInventory={() => fetchProducts()}
         />
       )}
     </View>
