@@ -17,6 +17,11 @@ export const updateUser = async (id, userData) => {
   return handleRequest(() => api.put(`/user/${id}`, userData));
 };
 
+
+export const updateUserPassword = async (id, userData) => {
+  return handleRequest(() => api.put(`/user/${id}/password`, userData));
+};
+
 export const deleteUser = async (id) => {
   return handleRequest(() => api.delete(`/user/${id}`));
 };

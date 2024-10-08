@@ -1,26 +1,74 @@
+
 import React, { useState, useContext } from 'react';
-import { Select, Box, Input, VStack, Button, Avatar, HStack, Text, IconButton, ScrollView, Center, useToast } from 'native-base';
+import { Select, Box, Input, VStack, CloseIcon, Button, Avatar, HStack, Text, IconButton, ScrollView, Center, useToast } from 'native-base';
 import { SessionContext } from '../../context/SessionContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { updateUser } from '../../services/user';
+import * as ImagePicker from 'expo-image-picker';
 
 const Config = () => {
-  const { user, clearSession } = useContext(SessionContext); // Obtener datos del contexto de sesión
+  const { user, saveSession, token } = useContext(SessionContext);
   const [username, setUsername] = useState(user?.username || '');
   const [email, setEmail] = useState(user?.email || '');
   const [roleId, setRoleId] = useState(user?.role_id.toString() || '');
-  const [password, setPassword] = useState('');
+  const [image, setImage] = useState(user?.image || '');
   const navigation = useNavigation();
   const toast = useToast();
 
-  const handleUpdate = () => {
-    toast.show({
-      title: "Perfil actualizado",
-      status: "success",
-      placement: "top",
-      duration: 2000,
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      toast.show({
+        title: "Permiso denegado",
+        status: "error",
+        placement: "top",
+        duration: 2000,
+      });
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+      base64: true,
     });
+    setImage(`data:image/jpeg;base64,${result.assets[0].base64}`);
+  };
+
+  const showCustomToast = (message, bgColor) => {
+    toast.show({
+      placement: "top-right",
+      duration: 3000,
+      render: () => (
+        <Box bg={bgColor} px="4" py="2" rounded="md" mb={5}>
+          <HStack space={2} justifyContent="space-between" alignItems="center">
+            <Text color="white" fontWeight="bold">{message}</Text>
+            <IconButton icon={<CloseIcon size="xs" color="white" />} onPress={() => toast.closeAll()} />
+          </HStack>
+        </Box>
+      ),
+    });
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const user_updated = { username, email, role_id: roleId, image };
+      const update_profile = await updateUser(user.id, user_updated);
+      console.log(update_profile);
+      if (update_profile.status === 200) {
+        saveSession(user_updated, token);
+        showCustomToast('Perfil Actualizado', 'green.500')
+        return;
+      }
+
+      showCustomToast('Error al actualizar perfil', 'red.500')
+    } catch (error) {
+      showCustomToast(`Error ${error}`, 'red.500')
+    }
   };
 
   return (
@@ -28,9 +76,15 @@ const Config = () => {
       <Center mt={10}>
         <VStack space={4} width="90%">
           <Center>
-            <HStack>
-              <Avatar size="xl" source={{ uri: user?.image ?? 'https://via.placeholder.com/150' }} />
-              <FontAwesome name="exchange" size={24} color="gray" />
+            <HStack position={'relative'}>
+              <Avatar size="xl" source={{ uri: image ?? 'https://via.placeholder.com/150' }} />
+              <IconButton
+                position={'absolute'}
+                right={'-10%'}
+                top={'-10%'}
+                icon={<FontAwesome name="exchange" size={16} color="gray" />}
+                onPress={pickImage}
+              />
             </HStack>
             <Text mt={2} bold fontSize="lg">{username || 'Username'}</Text>
             <Text fontSize="sm" color="gray.500">{email || 'user@gmail.com'}</Text>
@@ -74,8 +128,8 @@ const Config = () => {
             <Select.Item label="Administrador" value="1" />
             <Select.Item label="Vendedor" value="2" />
           </Select>
-          <Text textAlign={'right'} color={'success.700'} onPress={() => navigation.navigate('ChangePassword')}>Cambiar Contraseña</Text>
 
+          <Text textAlign={'right'} color={'success.700'} onPress={() => navigation.navigate('ChangePassword')}>Cambiar Contraseña</Text>
 
           <Button onPress={handleUpdate} colorScheme="green" mt={4}>
             Actualizar Perfil
@@ -87,3 +141,4 @@ const Config = () => {
 };
 
 export default Config;
+
