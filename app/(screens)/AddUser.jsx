@@ -9,7 +9,6 @@ const AddUser = () => {
   const [rol, setRol] = useState('');
   const [loading, setLoading] = useState(false);
   const toast = useToast();
-  console.log('add user view');
 
   const handleAgregarUsuario = async () => {
     if (!nombre || !rol) {
@@ -25,13 +24,12 @@ const AddUser = () => {
     try {
       const userData = {
         username: nombre,
-        password: 'defaultPassword',
+        password: 'measombrasgt',
         role_id: rol === 'admin' ? 1 : 2,
         email: `${nombre.toLowerCase().replace(' ', '.')}@example.com`,
       };
 
       const response = await createUser(userData);
-      console.log(response);
       if (response.status === 201) {
         toast.show({
           description: "Usuario creado exitosamente",

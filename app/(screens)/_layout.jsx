@@ -34,8 +34,8 @@ export default function Layout() {
 
 
   const handleLogout = async () => {
-    // await AsyncStorage.removeItem('user');
-    // await AsyncStorage.removeItem('token');
+    await AsyncStorage.removeItem('user');
+    await AsyncStorage.removeItem('token');
     clearSession();
     navigation.replace('index');
     showCustomToast('Se ha cerrado Sesión', 'red.500');
@@ -72,6 +72,11 @@ export default function Layout() {
           name="VerUsuarios"
           options={{ title: 'Usuarios' }}
         />
+
+        <Drawer.Screen
+          name="Config"
+          options={{ title: 'Configuración' }}
+        />
       </Drawer>
     </GestureHandlerRootView>
   );
@@ -80,6 +85,7 @@ export default function Layout() {
 function CustomDrawerContent(props) {
 
   const { user } = useContext(SessionContext);
+  const navigation = useNavigation();
   return (
     <DrawerContentScrollView {...props}>
       <Box p={4} bg="green.200">
@@ -87,12 +93,13 @@ function CustomDrawerContent(props) {
           <Avatar
             size="lg"
             source={{
-              uri: 'https://via.placeholder.com/150'
+              uri: user?.image ?? 'https://via.placeholder.com/150'
             }}
           />
           <VStack>
             <Text bold fontSize="md">{user?.username ?? 'Username'}</Text>
             <Text color="gray.500" fontSize="sm">{user?.email ?? 'user@gmail.com'}</Text>
+            <Text color="green.800" onPress={() => navigation.navigate('Config')} fontSize="sm">Mi Perfil</Text>
           </VStack>
         </HStack>
       </Box>
