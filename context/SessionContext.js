@@ -28,8 +28,6 @@ export const SessionProvider = ({ children }) => {
     try {
       const r1 = await AsyncStorage.setItem('user', JSON.stringify(user));
       const r2 = await AsyncStorage.setItem('token', token);
-      console.log(r1);
-      console.log(r2);
       setUser(user);
       setToken(token);
     } catch (error) {

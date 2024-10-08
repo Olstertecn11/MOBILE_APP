@@ -1,12 +1,6 @@
 
 import React, { useState, useContext } from 'react';
-import { Select, Box, Input, VStack, CloseIcon, Button, Avatar, HStack, Text, IconButton, ScrollView, Center, useToast } from 'native-base';
-import { SessionContext } from '../../context/SessionContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from 'expo-router';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { updateUser } from '../../services/user';
-import * as ImagePicker from 'expo-image-picker';
+import { Select, Box, Input, VStack, CloseIcon, Button, Avatar, HStack, Text, IconButton, ScrollView, Center, useToast, Spinner } from 'native-base'; // Asegúrate de que Spinner esté importado
 
 const Config = () => {
   const { user, saveSession, token } = useContext(SessionContext);
@@ -14,6 +8,7 @@ const Config = () => {
   const [email, setEmail] = useState(user?.email || '');
   const [roleId, setRoleId] = useState(user?.role_id.toString() || '');
   const [image, setImage] = useState(user?.image || '');
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
   const toast = useToast();
 
@@ -55,19 +50,23 @@ const Config = () => {
   };
 
   const handleUpdate = async () => {
+    setLoading(true); // Activa el loader
     try {
       const user_updated = { username, email, role_id: roleId, image };
       const update_profile = await updateUser(user.id, user_updated);
       console.log(update_profile);
       if (update_profile.status === 200) {
         saveSession(user_updated, token);
-        showCustomToast('Perfil Actualizado', 'green.500')
+        showCustomToast('Perfil Actualizado', 'green.500');
+        setLoading(false); // Desactiva el loader
         return;
       }
 
-      showCustomToast('Error al actualizar perfil', 'red.500')
+      showCustomToast('Error al actualizar perfil', 'red.500');
     } catch (error) {
-      showCustomToast(`Error ${error}`, 'red.500')
+      showCustomToast(`Error ${error}`, 'red.500');
+    } finally {
+      setLoading(false); // Desactiva el loader en caso de error o éxito
     }
   };
 
@@ -132,7 +131,7 @@ const Config = () => {
           <Text textAlign={'right'} color={'success.700'} onPress={() => navigation.navigate('ChangePassword')}>Cambiar Contraseña</Text>
 
           <Button onPress={handleUpdate} colorScheme="green" mt={4}>
-            Actualizar Perfil
+            {loading ? <Spinner color="white" size="sm" /> : 'Actualizar Perfil'}
           </Button>
         </VStack>
       </Center>

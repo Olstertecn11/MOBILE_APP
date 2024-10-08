@@ -11,7 +11,7 @@ const ChangePassword = () => {
   const toast = useToast();
   const user = useContext(SessionContext);
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
       toast.show({
         title: "Las contraseñas no coinciden",
@@ -33,7 +33,7 @@ const ChangePassword = () => {
     }
 
 
-    const response = updateUserPassword(user.id, { currentPassword, newPassword });
+    const response = await updateUserPassword(user.id, { currentPassword, newPassword });
     console.log(response);
     if (response.status === 200 || response.status == 200) {
       toast.show({
