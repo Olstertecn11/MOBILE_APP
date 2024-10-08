@@ -1,12 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Text, FlatList, HStack, useToast, Actionsheet, useDisclose } from 'native-base';
+import { Box, Button, Text, FlatList, HStack, useToast, Actionsheet, useDisclose, Input } from 'native-base';
 import { getAllusers, deleteUser } from '../../services/user';
 import { useIsFocused } from '@react-navigation/native';
 import ViewUser from '../../components/ViewUser';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const VerUsuarios = () => {
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchText, setSearchText] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,6 +23,7 @@ const VerUsuarios = () => {
       const response = await getAllusers();
       if (response.status === 200) {
         setUsers(response.data);
+        setFilteredUsers(response.data);
       } else {
         setError('Error fetching users');
       }
@@ -29,10 +33,19 @@ const VerUsuarios = () => {
       setLoading(false);
     }
   };
-  useEffect(() => {
 
+  useEffect(() => {
     if (isFocused) fetchUsers();
   }, [isFocused]);
+
+  const handleSearch = (text) => {
+    setSearchText(text);
+    const filtered = users.filter(user =>
+      user.username.toLowerCase().includes(text.toLowerCase()) ||
+      (user.role_id === 1 ? 'Administrador' : 'Vendedor').toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredUsers(filtered);
+  };
 
   const handleAction = async (action) => {
     if (action === 'visualizar') {
@@ -41,7 +54,6 @@ const VerUsuarios = () => {
       toast.show({ description: 'Editar usuario', bgColor: 'yellow.500' });
     } else if (action === 'eliminar') {
       const resp = await deleteUser(selectedUser.id);
-      console.log(resp);
       if (resp.status === 200 || resp.status == 200) {
         fetchUsers();
       }
@@ -68,8 +80,19 @@ const VerUsuarios = () => {
 
   return (
     <Box flex={1} bg="#ECFFE6" p={4} alignItems="center">
+      <Box w='100%'>
+        <HStack justifyContent="space-between" w="100%">
+          <Input
+            placeholder='Buscar...'
+            w='80%'
+            value={searchText}
+            onChangeText={handleSearch}
+          />
+          <Button bg='green.500'><AntDesign name="search1" size={24} color="white" /></Button>
+        </HStack>
+      </Box>
       <Box w="100%" bg="#fff" rounded="md" shadow={2}>
-        <Text fontSize="lg" bold textAlign="center" mb={2} mt={2}>Usuarios</Text>
+        <Text fontSize="lg" bold textAlign="center" mb={2} mt={2} bg='green.600' color='white'>Usuarios</Text>
 
         <HStack justifyContent="space-between" bg="#f0f0f0" p={2}>
           <Text bold textAlign="center" flex={1}>Nombre</Text>
@@ -78,7 +101,7 @@ const VerUsuarios = () => {
         </HStack>
 
         <FlatList
-          data={users}
+          data={filteredUsers}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <HStack justifyContent="space-between" p={2} borderBottomWidth={1} borderBottomColor="gray.200">
