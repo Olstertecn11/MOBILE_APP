@@ -6,6 +6,7 @@ import { useNavigation } from 'expo-router';
 import { Avatar, VStack, Box, Text, FormControl, Input, Stack, Button, useToast, HStack, IconButton, CloseIcon, Spinner, Center } from 'native-base';
 import { SessionContext } from '../../context/SessionContext';
 import { useState, useEffect, useContext } from 'react';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
