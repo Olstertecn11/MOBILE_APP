@@ -94,7 +94,7 @@ function CustomDrawerContent(props) {
           <Avatar
             size="lg"
             source={{
-              uri: user?.image ?? 'https://via.placeholder.com/150'
+              uri: user?.imageUri ?? 'https://via.placeholder.com/150'
             }}
           />
           <VStack>

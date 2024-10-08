@@ -21,7 +21,8 @@ const Config = () => {
   const saveImageToFileSystem = async (base64Image) => {
     try {
       const fileUri = `${FileSystem.documentDirectory}profile_image.png`;
-      await FileSystem.writeAsStringAsync(fileUri, base64Image, { encoding: FileSystem.EncodingType.Base64 });
+      const res = await FileSystem.writeAsStringAsync(fileUri, base64Image, { encoding: FileSystem.EncodingType.Base64 });
+      console.log(res);
       return fileUri;
     } catch (error) {
       console.error('Error al guardar la imagen en el sistema de archivos:', error);
@@ -52,7 +53,9 @@ const Config = () => {
     if (!result.canceled) {
       const base64Image = result.assets[0].base64;
       const fileUri = await saveImageToFileSystem(base64Image);
+      console.log(fileUri);
       if (fileUri) {
+        console.log(fileUri);
         setImageUri(fileUri);
       }
     }
@@ -76,8 +79,10 @@ const Config = () => {
   const handleUpdate = async () => {
     setLoading(true); // Activa el loader
     try {
-      const user_updated = { username, email, role_id: roleId, imageUri }; // Guarda la URI en lugar del base64
+      const user_updated = { username, email, role_id: roleId, image: imageUri }; // Guarda la URI en lugar del base64
+      console.log(user_updated);
       const update_profile = await updateUser(user.id, user_updated);
+      console.log(update_profile);
       if (update_profile.status === 200) {
         saveSession(user_updated, token);
         showCustomToast('Perfil Actualizado', 'green.500');

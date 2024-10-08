@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput, Alert } from 'react-native';
 import { Actionsheet, useDisclose, Button } from 'native-base';
-import { getAllProducts } from '../../services/product'; // Import the getAllProducts service
+import { getAllProducts } from '../../services/product';
 
 const Inventario = () => {
   const [searchQuery, setSearchQuery] = useState('');
