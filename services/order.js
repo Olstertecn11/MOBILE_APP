@@ -5,6 +5,10 @@ export const createOrder = async (order) => {
   return handleRequest(() => api.post('/orders', order));
 };
 
+export const getOrders = async () => {
+  return handleRequest(() => api.get('/orders'));
+};
+
 // export const getAllusers = async () => {
 //   return handleRequest(() => api.get('/user'));
 // };
