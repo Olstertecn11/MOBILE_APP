@@ -6,6 +6,7 @@ import { getAllProducts } from '../../services/product';
 import { useIsFocused } from '@react-navigation/native';
 import { getAllclient } from '../../services/client';
 import { getAllusers } from '../../services/user';
+import { createOrder } from '../../services/order';
 
 export default function AddOrder() {
   const [cliente, setCliente] = useState('');
@@ -87,16 +88,24 @@ export default function AddOrder() {
     setMetodoPago('');
     setPrecioTotal(0.00);
   }
-  const handleRealizarPedido = () => {
+  const handleRealizarPedido = async () => {
     const pedido = {
-      cliente,
-      vendedor,
-      direccion,
-      productos: productosPedido,
-      metodoPago,
-      precioTotal,
+      client_id: cliente,
+      total: precioTotal,
+      items: productosPedido.map((producto) => ({
+        product_id: producto.id,
+        quantity: producto.quantity,
+        unit_price: producto.unit_price,
+        total: producto.unit_price * producto.quantity
+      }))
     };
-    console.log(pedido);
+    const response = await createOrder(pedido);
+    console.log(response);
+    if (response.status === 201 || response.status == 201) {
+      alert('Pedido realizado con éxito');
+      return;
+    }
+    alert('Error al realizar el pedido');
   };
 
   return (
