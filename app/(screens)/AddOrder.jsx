@@ -1,6 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { Select, HStack, Button } from 'native-base';
+import { getAllProducts } from '../../services/product';
+import { useIsFocused } from '@react-navigation/native';
+import { getAllclient } from '../../services/client';
+import { getAllusers } from '../../services/user';
 
 export default function AddOrder() {
   const [cliente, setCliente] = useState('');
@@ -11,16 +16,47 @@ export default function AddOrder() {
   const [productosPedido, setProductosPedido] = useState([]);
   const [cantidad, setCantidad] = useState('');
   const [metodoPago, setMetodoPago] = useState('');
-  const [precioTotal, setPrecioTotal] = useState(0.00); // Precio total dinámico
+  const [precioTotal, setPrecioTotal] = useState(0.00);
+  const [prds, setPrds] = useState([]);
+  const isFocused = useIsFocused();
 
-  const productosMock = [
-    { id: 1, name: 'Producto 1', price: 100 },
-    { id: 2, name: 'Producto 2', price: 200 },
-    { id: 3, name: 'Producto 3', price: 150 },
-  ];
+  const [users, setUsers] = useState([]);
+  const [clients, setClients] = useState([]);
+
+
+  useEffect(() => {
+    if (isFocused) {
+      getProducts();
+      getUsers();
+      getClients();
+    }
+  }, [isFocused]);
+
+
+  const getProducts = async () => {
+    const response = await getAllProducts();
+    if (response.status === 200 || response.status == 200 || response.status === 201) {
+      setPrds(response.data);
+    }
+  }
+
+  const getUsers = async () => {
+    const response = await getAllusers();
+    if (response.status === 200 || response.status == 200 || response.status === 201) {
+      setUsers(response.data);
+    }
+  }
+
+  const getClients = async () => {
+    const response = await getAllclient();
+    if (response.status === 200 || response.status == 200 || response.status === 201) {
+      console.log(response);
+      setClients(response.data);
+    }
+  }
 
   const buscarProducto = (query) => {
-    const results = productosMock.filter((producto) =>
+    const results = prds.filter((producto) =>
       producto.name.toLowerCase().includes(query.toLowerCase())
     );
     setProductosEncontrados(results);
@@ -33,12 +69,24 @@ export default function AddOrder() {
     };
 
     setProductosPedido([...productosPedido, productoConCantidad]);
-    setPrecioTotal(precioTotal + productoConCantidad.price * productoConCantidad.quantity);
+    setPrecioTotal(precioTotal + productoConCantidad.unit_price * productoConCantidad.quantity);
     setCantidad('');
     setProductoBusqueda('');
     setProductosEncontrados([]);
   };
 
+
+  const handleCancel = () => {
+    setCliente('');
+    setVendedor('');
+    setDireccion('');
+    setProductoBusqueda('');
+    setProductosEncontrados([]);
+    setProductosPedido([]);
+    setCantidad('');
+    setMetodoPago('');
+    setPrecioTotal(0.00);
+  }
   const handleRealizarPedido = () => {
     const pedido = {
       cliente,
@@ -48,98 +96,112 @@ export default function AddOrder() {
       metodoPago,
       precioTotal,
     };
-    console.log('Pedido realizado:', pedido);
+    console.log(pedido);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Cliente</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Cliente"
-        value={cliente}
-        onChangeText={setCliente}
-      />
+    <ScrollView >
+      <View style={styles.container}>
 
-      <Text style={styles.label}>Vendedor</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Vendedor"
-        value={vendedor}
-        onChangeText={setVendedor}
-      />
 
-      <Text style={styles.label}>Dirección</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Dirección"
-        value={direccion}
-        onChangeText={setDireccion}
-      />
+        <Text style={styles.label}>Vendedor</Text>
+        <Select onValueChange={(item) => setVendedor(item)} mb={6}>
+          {users && users.map((user, index) => (
+            <Select.Item key={index} label={user.username} value={user.id} />
+          ))}
+        </Select>
 
-      <Text style={styles.label}>Buscar Producto</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Buscar producto"
-        value={productoBusqueda}
-        onChangeText={(query) => {
-          setProductoBusqueda(query);
-          buscarProducto(query);
-        }}
-      />
 
-      <ScrollView style={styles.scrollView}>
-        {productosEncontrados.length > 0 ? (
-          productosEncontrados.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.productoEncontrado}
-              onPress={() => agregarProducto(item)}
-            >
-              <Text>{item.name}</Text>
-              <Text>Precio: Q {item.price}</Text>
-            </TouchableOpacity>
+        <Text style={styles.label}>Cliente</Text>
+        <Select onValueChange={(item) => setCliente(item)} mb={5}>
+          {clients && clients.map((client, index) => (
+            <Select.Item key={index} label={client.name} value={client.id} />
+          ))}
+        </Select>
+
+
+        <Text style={styles.label}>Dirección</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Dirección"
+          value={direccion}
+          onChangeText={setDireccion}
+        />
+
+        <Text style={styles.label}>Buscar Producto</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Buscar producto"
+          value={productoBusqueda}
+          onChangeText={(query) => {
+            setProductoBusqueda(query);
+            buscarProducto(query);
+          }}
+        />
+
+        <ScrollView style={styles.scrollView}>
+          {productosEncontrados.length > 0 ? (
+            productosEncontrados.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.productoEncontrado}
+                onPress={() => agregarProducto(item)}
+              >
+                <Text>{item.name}</Text>
+                <Text>Precio: Q {item.unit_price}</Text>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text style={styles.noProductos}>No se encontraron productos</Text>
+          )}
+        </ScrollView>
+
+        <Text style={styles.label}>Cantidad</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Cantidad"
+          value={cantidad}
+          keyboardType="numeric"
+          onChangeText={setCantidad}
+        />
+
+        <Text style={styles.label}>Método de pago</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Método de pago"
+          value={metodoPago}
+          onChangeText={setMetodoPago}
+        />
+
+        <Text style={styles.total}>Productos Agregados</Text>
+        {productosPedido.length > 0 ? (
+          productosPedido.map((producto, index) => (
+            <Text key={index} style={styles.productoAgregado}>
+              {producto.name} - {producto.quantity} unidades - Q.{producto.unit_price * producto.quantity}
+            </Text>
           ))
         ) : (
-          <Text style={styles.noProductos}>No se encontraron productos</Text>
+          <Text style={styles.noProductos}>No hay productos agregados</Text>
         )}
-      </ScrollView>
 
-      <Text style={styles.label}>Cantidad</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Cantidad"
-        value={cantidad}
-        keyboardType="numeric"
-        onChangeText={setCantidad}
-      />
+        <Text style={styles.total}>Precio total</Text>
+        <Text style={styles.totalAmount}>Q.{precioTotal.toFixed(2)}</Text>
 
-      <Text style={styles.label}>Método de pago</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Método de pago"
-        value={metodoPago}
-        onChangeText={setMetodoPago}
-      />
 
-      <Text style={styles.total}>Productos Agregados</Text>
-      {productosPedido.length > 0 ? (
-        productosPedido.map((producto, index) => (
-          <Text key={index} style={styles.productoAgregado}>
-            {producto.name} - {producto.quantity} unidades - Q.{producto.price * producto.quantity}
-          </Text>
-        ))
-      ) : (
-        <Text style={styles.noProductos}>No hay productos agregados</Text>
-      )}
+        <HStack w='100%' style={{ justifyContent: 'center' }} mb={4}>
 
-      <Text style={styles.total}>Precio total</Text>
-      <Text style={styles.totalAmount}>Q.{precioTotal.toFixed(2)}</Text>
+          <Button onPress={handleRealizarPedido} mr={1} w='80%' colorScheme={'green'}>
+            Realizar pedido
+          </Button>
 
-      <TouchableOpacity style={styles.button} onPress={handleRealizarPedido}>
-        <Text style={styles.buttonText}>Realizar pedido</Text>
-      </TouchableOpacity>
-    </View>
+          <Button onPress={handleCancel} colorScheme={'red'} >
+            Cancelar
+          </Button>
+
+        </HStack>
+
+      </View>
+    </ScrollView>
   );
 }
 
@@ -148,6 +210,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#EAF9E1',
     padding: 20,
+    overflow: 'scroll',
     justifyContent: 'center',
   },
   label: {
@@ -165,7 +228,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FDFDFD',
   },
   scrollView: {
-    maxHeight: 150,
+    maxHeight: 350,
+    minHeight: 250,
+    height: 'auto',
+    padding: 10,
     marginBottom: 15,
     backgroundColor: '#FDFDFD',
     borderColor: '#C0C0C0',

@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Button, StyleSheet, ScrollView, Image, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system'; // Import FileSystem
-import { createProduct } from '../../services/product'; // Import the product service
+import * as FileSystem from 'expo-file-system';
+import { createProduct } from '../../services/product';
 
 export default function AddProduct() {
   const [form, setForm] = useState({
