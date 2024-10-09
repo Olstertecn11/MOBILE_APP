@@ -7,9 +7,8 @@ import { Avatar, VStack, Box, Text, FormControl, Input, Stack, Button, useToast,
 import { SessionContext } from '../../context/SessionContext';
 import { useState, useEffect, useContext } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { logout } from '../../services/auth';
+import { logout, getInfo } from '../../services/auth';
 
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Layout() {
   const navigation = useNavigation();
@@ -90,9 +89,23 @@ export default function Layout() {
 
 function CustomDrawerContent(props) {
 
-  const { user } = useContext(SessionContext);
-  console.log(user)
+  const { user, token } = useContext(SessionContext);
+  const [image, setImage] = useState(null);
   const navigation = useNavigation();
+
+  const loadProfile = async () => {
+    if (token) {
+      const response = await getInfo(token);
+      if (response.status == 200 || response.status === 200) {
+        setImage(response.data.user.image);
+      }
+    }
+  }
+
+  useEffect(() => {
+    loadProfile();
+  }, [user]);
+
   return (
     <DrawerContentScrollView {...props}>
       <Box p={4} bg="green.200">
@@ -100,7 +113,7 @@ function CustomDrawerContent(props) {
           <Avatar
             size="lg"
             source={{
-              uri: user?.imageUri ?? 'https://via.placeholder.com/150'
+              uri: image ?? 'https://via.placeholder.com/150'
             }}
           />
           <VStack>

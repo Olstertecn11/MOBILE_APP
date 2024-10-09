@@ -1,19 +1,54 @@
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function AddOrder() {
   const [cliente, setCliente] = useState('');
   const [vendedor, setVendedor] = useState('');
   const [direccion, setDireccion] = useState('');
-  const [producto, setProducto] = useState('');
+  const [productoBusqueda, setProductoBusqueda] = useState('');
+  const [productosEncontrados, setProductosEncontrados] = useState([]);
+  const [productosPedido, setProductosPedido] = useState([]);
   const [cantidad, setCantidad] = useState('');
   const [metodoPago, setMetodoPago] = useState('');
-  const [precioTotal, setPrecioTotal] = useState(350.00); // Precio total fijo para el ejemplo
+  const [precioTotal, setPrecioTotal] = useState(0.00); // Precio total dinámico
+
+  const productosMock = [
+    { id: 1, name: 'Producto 1', price: 100 },
+    { id: 2, name: 'Producto 2', price: 200 },
+    { id: 3, name: 'Producto 3', price: 150 },
+  ];
+
+  const buscarProducto = (query) => {
+    const results = productosMock.filter((producto) =>
+      producto.name.toLowerCase().includes(query.toLowerCase())
+    );
+    setProductosEncontrados(results);
+  };
+
+  const agregarProducto = (producto) => {
+    const productoConCantidad = {
+      ...producto,
+      quantity: cantidad ? parseInt(cantidad) : 1,
+    };
+
+    setProductosPedido([...productosPedido, productoConCantidad]);
+    setPrecioTotal(precioTotal + productoConCantidad.price * productoConCantidad.quantity);
+    setCantidad('');
+    setProductoBusqueda('');
+    setProductosEncontrados([]);
+  };
 
   const handleRealizarPedido = () => {
-    // Lógica para procesar el pedido
-    console.log('Pedido realizado');
+    const pedido = {
+      cliente,
+      vendedor,
+      direccion,
+      productos: productosPedido,
+      metodoPago,
+      precioTotal,
+    };
+    console.log('Pedido realizado:', pedido);
   };
 
   return (
@@ -42,13 +77,33 @@ export default function AddOrder() {
         onChangeText={setDireccion}
       />
 
-      <Text style={styles.label}>Producto</Text>
+      <Text style={styles.label}>Buscar Producto</Text>
       <TextInput
         style={styles.input}
-        placeholder="Producto"
-        value={producto}
-        onChangeText={setProducto}
+        placeholder="Buscar producto"
+        value={productoBusqueda}
+        onChangeText={(query) => {
+          setProductoBusqueda(query);
+          buscarProducto(query);
+        }}
       />
+
+      <ScrollView style={styles.scrollView}>
+        {productosEncontrados.length > 0 ? (
+          productosEncontrados.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.productoEncontrado}
+              onPress={() => agregarProducto(item)}
+            >
+              <Text>{item.name}</Text>
+              <Text>Precio: Q {item.price}</Text>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <Text style={styles.noProductos}>No se encontraron productos</Text>
+        )}
+      </ScrollView>
 
       <Text style={styles.label}>Cantidad</Text>
       <TextInput
@@ -66,6 +121,17 @@ export default function AddOrder() {
         value={metodoPago}
         onChangeText={setMetodoPago}
       />
+
+      <Text style={styles.total}>Productos Agregados</Text>
+      {productosPedido.length > 0 ? (
+        productosPedido.map((producto, index) => (
+          <Text key={index} style={styles.productoAgregado}>
+            {producto.name} - {producto.quantity} unidades - Q.{producto.price * producto.quantity}
+          </Text>
+        ))
+      ) : (
+        <Text style={styles.noProductos}>No hay productos agregados</Text>
+      )}
 
       <Text style={styles.total}>Precio total</Text>
       <Text style={styles.totalAmount}>Q.{precioTotal.toFixed(2)}</Text>
@@ -98,6 +164,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: '#FDFDFD',
   },
+  scrollView: {
+    maxHeight: 150,
+    marginBottom: 15,
+    backgroundColor: '#FDFDFD',
+    borderColor: '#C0C0C0',
+    borderWidth: 1,
+    borderRadius: 5,
+  },
+  productoEncontrado: {
+    padding: 10,
+    backgroundColor: '#e6e6e6',
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  noProductos: {
+    fontSize: 16,
+    color: '#FF6B6B',
+    marginBottom: 20,
+  },
   total: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -122,3 +207,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+

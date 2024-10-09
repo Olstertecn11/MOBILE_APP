@@ -7,16 +7,30 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SessionContext } from '../../context/SessionContext';
 import { updateUser } from '../../services/user';
+import { getInfo } from '../../services/auth';
 
 const Config = () => {
   const { user, saveSession, token } = useContext(SessionContext);
   const [username, setUsername] = useState(user?.username || '');
   const [email, setEmail] = useState(user?.email || '');
   const [roleId, setRoleId] = useState(user?.role_id?.toString() || '');
-  const [imageUri, setImageUri] = useState(user?.imageUri || 'https://via.placeholder.com/150');
+  const [imageUri, setImageUri] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
   const toast = useToast();
+
+  const loadProfile = async () => {
+    if (token) {
+      const response = await getInfo(token);
+      if (response.status == 200 || response.status === 200) {
+        setImageUri(response.data.user.image);
+      }
+    }
+  }
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -74,10 +88,6 @@ const Config = () => {
     });
   };
 
-  useEffect(() => {
-    console.log('changing image');
-  }, [imageUri]);
-
   const handleUpdate = async () => {
     setLoading(true);
     try {
@@ -88,9 +98,11 @@ const Config = () => {
         base64Image = `data:image/jpeg;base64,${base64}`;
       }
 
-      const user_updated = { username, email, role_id: roleId, image: base64Image };
+      const user_updated = { ...user, username, email, role_id: roleId, image: base64Image };
+      console.log('user');
+      console.log(user);
       const update_profile = await updateUser(user.id, user_updated);
-
+      console.log(update_profile);
       if (update_profile.status === 200) {
         saveSession(user_updated, token);
         showCustomToast('Perfil Actualizado', 'green.500');
@@ -99,6 +111,7 @@ const Config = () => {
       }
 
       showCustomToast('Error al actualizar perfil', 'red.500');
+      loadProfile();
     } catch (error) {
       showCustomToast(`Error ${error}`, 'red.500');
     } finally {
