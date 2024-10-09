@@ -86,6 +86,7 @@ export default function Layout() {
 function CustomDrawerContent(props) {
 
   const { user } = useContext(SessionContext);
+  console.log(user)
   const navigation = useNavigation();
   return (
     <DrawerContentScrollView {...props}>
