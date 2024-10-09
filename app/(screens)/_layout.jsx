@@ -7,13 +7,14 @@ import { Avatar, VStack, Box, Text, FormControl, Input, Stack, Button, useToast,
 import { SessionContext } from '../../context/SessionContext';
 import { useState, useEffect, useContext } from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { logout } from '../../services/auth';
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Layout() {
   const navigation = useNavigation();
   const toast = useToast();
-  const { clearSession } = useContext(SessionContext);
+  const { clearSession, token } = useContext(SessionContext);
 
 
 
@@ -35,11 +36,15 @@ export default function Layout() {
 
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('user');
-    await AsyncStorage.removeItem('token');
-    clearSession();
-    navigation.replace('index');
-    showCustomToast('Se ha cerrado Sesión', 'red.500');
+    const response = await logout(token);
+    console.log(response);
+    if (response.status == 200 || response.status === 200) {
+      clearSession();
+      navigation.replace('index');
+      showCustomToast('Se ha cerrado Sesión', 'red.500');
+      return;
+    }
+    showCustomToast('Error al cerrar sesión', 'red.500');
   };
 
   return (

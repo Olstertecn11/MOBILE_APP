@@ -9,7 +9,7 @@ const ChangePassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const toast = useToast();
-  const user = useContext(SessionContext);
+  const { user } = useContext(SessionContext);
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {

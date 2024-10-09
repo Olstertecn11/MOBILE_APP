@@ -4,3 +4,11 @@ import handleRequest from '../utils/handleRequest';
 export const login = async (credentials) => {
   return handleRequest(() => api.post('/auth/login', credentials));
 }
+
+export const logout = async (token) => {
+  return handleRequest(() => api.post('/auth/logout', { token }));
+}
+
+export const getInfo = async (token) => {
+  return handleRequest(() => api.post('/auth/me', { token }));
+}
