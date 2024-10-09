@@ -77,7 +77,7 @@ export default function AddProduct() {
       const response = await createProduct(productData);
       console.log(response);
 
-      if (response && response.success) {
+      if (response.status === 201 || response.status === 200) {
         Alert.alert('Success', 'Product added successfully');
         setForm({
           codigo: '',

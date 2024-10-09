@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, TextInput, Alert } from 'react-native';
 import { Actionsheet, useDisclose, Button } from 'native-base';
-import { getAllProducts } from '../../services/product';
+import { getAllProducts, deleteProduct } from '../../services/product';
 import ViewProduct from '../../components/ViewProduct';
+import { useIsFocused } from '@react-navigation/native';
 
 const Inventario = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -11,8 +12,8 @@ const Inventario = () => {
   const [sortedData, setSortedData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclose();
+  const isFocused = useIsFocused();
   const [isViewProductOpen, setIsViewProductOpen] = useState(false);
-
 
   const fetchProducts = async () => {
     try {
@@ -25,9 +26,9 @@ const Inventario = () => {
   };
 
   useEffect(() => {
-
-    fetchProducts();
-  }, []);
+    if (isFocused)
+      fetchProducts();
+  }, [isFocused]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -48,6 +49,19 @@ const Inventario = () => {
     });
     setSortedData(sorted);
     setSortOrder(newSortOrder);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await deleteProduct(id);
+      if (response.status === 200) {
+        Alert.alert('Producto eliminado con éxito');
+        fetchProducts();
+        onClose();
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Error al eliminar producto');
+    }
   };
 
   const openActionsheet = (item) => {
@@ -103,7 +117,7 @@ const Inventario = () => {
       <Actionsheet isOpen={isOpen} onClose={onClose}>
         <Actionsheet.Content>
           <Actionsheet.Item onPress={() => { setIsViewProductOpen(true); onClose(); }}>Visualizar</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => alert(`Eliminando ${selectedItem?.name}`)} color="red.500">Eliminar</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => handleDelete(selectedItem.id)} color="red.500">Eliminar</Actionsheet.Item>
           <Actionsheet.Item onPress={onClose}>Cancelar</Actionsheet.Item>
         </Actionsheet.Content>
       </Actionsheet>
