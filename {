@@ -1,14 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useToast, Box, Select, Text, HStack, Button, IconButton, CloseIcon } from 'native-base';
+import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { Box, Select, HStack, Button } from 'native-base';
 import { getAllProducts } from '../../services/product';
 import { useIsFocused } from '@react-navigation/native';
 import { getAllclient } from '../../services/client';
 import { getAllusers } from '../../services/user';
 import { createOrder } from '../../services/order';
 import Loader from '../../components/Loader';
-import AntDesign from '@expo/vector-icons/AntDesign';
 
 
 export default function AddOrder() {
@@ -24,26 +23,11 @@ export default function AddOrder() {
   const [prds, setPrds] = useState([]);
   const isFocused = useIsFocused();
   const [loading, setLoading] = useState(true);
-  const toast = useToast();
 
   const [users, setUsers] = useState([]);
   const [clients, setClients] = useState([]);
 
 
-  const showCustomToast = (message, bgColor) => {
-    toast.show({
-      placement: "top-right",
-      duration: 3000,
-      render: () => (
-        <Box bg={bgColor} px="4" py="2" rounded="md" mb={5}>
-          <HStack space={2} justifyContent="space-between" alignItems="center">
-            <Text color="white" fontWeight="bold">{message}</Text>
-            <IconButton icon={<CloseIcon size="xs" color="white" />} onPress={() => toast.closeAll()} />
-          </HStack>
-        </Box>
-      ),
-    });
-  };
   useEffect(() => {
     if (isFocused) {
       getProducts();
@@ -59,6 +43,7 @@ export default function AddOrder() {
       setPrds(response.data);
       setProductosEncontrados(response.data);
     }
+    setLoading(false);
   }
 
   const getUsers = async () => {
@@ -71,43 +56,16 @@ export default function AddOrder() {
   const getClients = async () => {
     const response = await getAllclient();
     if (response.status === 200 || response.status == 200 || response.status === 201) {
+      console.log(response);
       setClients(response.data);
     }
   }
 
   const buscarProducto = (query) => {
     const results = prds.filter((producto) =>
-      producto.name.toLowerCase().includes(query.toLowerCase()) &&
-      !productosPedido.some(pedido => pedido.id === producto.id)
+      producto.name.toLowerCase().includes(query.toLowerCase())
     );
     setProductosEncontrados(results);
-  };
-
-  const actualizarCantidadProducto = (productoId, incremento) => {
-    let nuevoPrecioTotal = precioTotal;
-
-    const nuevosProductosPedido = productosPedido
-      .map((producto) => {
-        if (producto.id === productoId) {
-          const nuevaCantidad = producto.quantity + incremento;
-
-          nuevoPrecioTotal += producto.unit_price * incremento;
-
-          if (nuevaCantidad > 0) {
-            return { ...producto, quantity: nuevaCantidad };
-          }
-          return null;
-        }
-        return producto;
-      })
-      .filter(producto => producto !== null);
-
-    setProductosPedido(nuevosProductosPedido);
-
-    setPrecioTotal(nuevoPrecioTotal);
-
-    const productosFiltrados = prds.filter(p => !nuevosProductosPedido.some(pedido => pedido.id === p.id));
-    setProductosEncontrados(productosFiltrados);
   };
 
   const agregarProducto = (producto) => {
@@ -120,8 +78,7 @@ export default function AddOrder() {
     setPrecioTotal(precioTotal + productoConCantidad.unit_price * productoConCantidad.quantity);
     setCantidad('');
     setProductoBusqueda('');
-    const productosFiltrados = prds.filter(p => ![...productosPedido, productoConCantidad].some(pedido => pedido.id === p.id));
-    setProductosEncontrados(productosFiltrados);
+    setProductosEncontrados(prds);
   };
 
 
@@ -130,22 +87,13 @@ export default function AddOrder() {
     setVendedor('');
     setDireccion('');
     setProductoBusqueda('');
-    setProductosEncontrados(prds);
+    setProductosEncontrados([]);
     setProductosPedido([]);
     setCantidad('');
     setMetodoPago('');
     setPrecioTotal(0.00);
   }
-
-
   const handleRealizarPedido = async () => {
-    if (!cliente || !vendedor || !direccion || productosPedido.length === 0 || !metodoPago) {
-      showCustomToast('Por favor completa todos los campos', 'red.500');
-      return;
-    }
-
-    setLoading(true);
-
     const pedido = {
       client_id: cliente,
       total: precioTotal,
@@ -156,31 +104,20 @@ export default function AddOrder() {
         total: producto.unit_price * producto.quantity
       }))
     };
-
     const response = await createOrder(pedido);
     console.log(response);
-
     if (response.status === 201 || response.status == 201) {
-      showCustomToast('Pedido realizado con éxito', 'green.500');
-      setLoading(false);
       alert('Pedido realizado con éxito');
       return;
     }
-
-    showCustomToast('Error al realizar el pedido', 'red.500');
-    setLoading(false);
-
-    setTimeout(() => {
-      handleCancel();
-    }, 1000);
+    alert('Error al realizar el pedido');
   };
 
   return (
     <ScrollView >
-
       <View style={styles.container}>
 
-        <Loader loading={loading} />
+
         <Text style={styles.label}>Vendedor</Text>
         <Select onValueChange={(item) => setVendedor(item)} mb={6}>
           {users && users.map((user, index) => (
@@ -188,12 +125,14 @@ export default function AddOrder() {
           ))}
         </Select>
 
+
         <Text style={styles.label}>Cliente</Text>
         <Select onValueChange={(item) => setCliente(item)} mb={5}>
           {clients && clients.map((client, index) => (
             <Select.Item key={index} label={client.name} value={client.id} />
           ))}
         </Select>
+
 
         <Text style={styles.label}>Dirección</Text>
         <TextInput
@@ -215,6 +154,7 @@ export default function AddOrder() {
         />
 
         <ScrollView style={styles.scrollView}>
+          <Loader loading={loading} />
           {productosEncontrados.length > 0 ? (
             productosEncontrados.map((item, index) => (
               <TouchableOpacity
@@ -231,6 +171,15 @@ export default function AddOrder() {
           )}
         </ScrollView>
 
+        <Text style={styles.label}>Cantidad</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Cantidad"
+          value={cantidad}
+          keyboardType="numeric"
+          onChangeText={setCantidad}
+        />
+
         <Text style={styles.label}>Método de pago</Text>
         <TextInput
           style={styles.input}
@@ -242,17 +191,13 @@ export default function AddOrder() {
         <Text style={styles.total}>Productos Agregados</Text>
         {productosPedido.length > 0 ? (
           productosPedido.map((producto, index) => (
-            <Box key={index} bg='muted.50' p={4} borderRadius={'12px'} >
-              <Text style={styles.productoAgregado}>
+            <Box bg='muted.50' p={4} borderRadius={'12px'}>
+              <Text key={index} style={styles.productoAgregado}>
                 {producto.name} -  unidades({producto.quantity}) - Q.{producto.unit_price * producto.quantity}
               </Text>
-              <HStack space={2}>
-                <Button _pressed={{ bg: 'gray.50' }} bg='transparent' onPress={() => actualizarCantidadProducto(producto.id, 1)}>
-                  <AntDesign name="pluscircle" size={24} color="green" />
-                </Button>
-                <Button _pressed={{ bg: 'gray.50' }} bg='transparent' onPress={() => actualizarCantidadProducto(producto.id, -1)}>
-                  <AntDesign name="minuscircle" size={24} color="red" />
-                </Button>
+              <HStack>
+                <Button h={'8px'} w={'8px'} fontSize={'4px'}>+</Button>
+                <Button >-</Button>
               </HStack>
             </Box>
           ))
@@ -262,6 +207,7 @@ export default function AddOrder() {
 
         <Text style={styles.total}>Precio total</Text>
         <Text style={styles.totalAmount}>Q.{precioTotal.toFixed(2)}</Text>
+
 
         <HStack w='100%' style={{ justifyContent: 'center' }} mb={4}>
 
@@ -279,9 +225,6 @@ export default function AddOrder() {
     </ScrollView>
   );
 }
-
-
-
 
 const styles = StyleSheet.create({
   container: {

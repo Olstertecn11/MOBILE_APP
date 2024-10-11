@@ -60,6 +60,7 @@ const VerOrders = () => {
 
   const viewOrder = async (order_id) => {
     const response = await getOrderItems(order_id);
+    console.log(response.data.items);
     if (response.status === 200) {
       setOrderDetails({
         order: selectedOrder,
@@ -121,6 +122,7 @@ const VerOrders = () => {
         <ViewOrder
           order={orderDetails}
           isOpen={isModalOpen}
+          orderColor={getColorStatus(orderDetails.order.status)}
           onClose={() => setIsModalOpen(false)}
         />
       )}
