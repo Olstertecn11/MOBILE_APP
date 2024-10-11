@@ -3,6 +3,7 @@ import React, { useContext, useState } from 'react';
 import { VStack, Input, Button, Text, Box, useToast, Center } from 'native-base';
 import { updateUserPassword } from '../../services/user';
 import { SessionContext } from '../../context/SessionContext';
+import BackButton from '../../components/BackButton';
 
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -51,7 +52,9 @@ const ChangePassword = () => {
 
   return (
     <Box safeArea p="1" w="100%" py="2">
-      <Center >
+      <BackButton route='hidden/Config' />
+
+      <Center mt={10} >
 
         <VStack space={4} w='90%'  >
           <Text fontSize="lg" bold>Cambiar Contraseña</Text>

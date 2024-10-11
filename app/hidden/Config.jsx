@@ -8,6 +8,8 @@ import { useNavigation } from '@react-navigation/native';
 import { SessionContext } from '../../context/SessionContext';
 import { updateUser } from '../../services/user';
 import { getInfo } from '../../services/auth';
+import BackButton from '../../components/BackButton';
+
 
 const Config = () => {
   const { user, saveSession, token } = useContext(SessionContext);
@@ -121,6 +123,7 @@ const Config = () => {
 
   return (
     <ScrollView>
+      <BackButton />
       <Center mt={10}>
         <VStack space={4} width="90%">
           <Center>
@@ -177,7 +180,7 @@ const Config = () => {
             <Select.Item label="Vendedor" value="2" />
           </Select>
 
-          <Text textAlign={'right'} color={'success.700'} onPress={() => navigation.navigate('ChangePassword')}>Cambiar Contraseña</Text>
+          <Text textAlign={'right'} color={'success.700'} onPress={() => navigation.push('hidden/ChangePassword')}>Cambiar Contraseña</Text>
 
           <Button onPress={handleUpdate} colorScheme="green" mt={4}>
             {loading ? <Spinner color="white" size="sm" /> : 'Actualizar Perfil'}

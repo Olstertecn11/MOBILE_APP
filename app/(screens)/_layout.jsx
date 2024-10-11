@@ -78,9 +78,10 @@ export default function Layout() {
           options={{ title: 'Usuarios' }}
         />
 
+
         <Drawer.Screen
-          name="Config"
-          options={{ title: 'Configuración' }}
+          name="VerOrders"
+          options={{ title: 'Ordenes' }}
         />
       </Drawer>
     </GestureHandlerRootView>
@@ -119,7 +120,7 @@ function CustomDrawerContent(props) {
           <VStack>
             <Text bold fontSize="md">{user?.username ?? 'Username'}</Text>
             <Text color="gray.500" fontSize="sm">{user?.email ?? 'user@gmail.com'}</Text>
-            <Text color="green.800" onPress={() => navigation.navigate('Config')} fontSize="sm">Mi Perfil</Text>
+            <Text color="green.800" onPress={() => navigation.push('hidden/Config')} fontSize="sm">Mi Perfil</Text>
           </VStack>
         </HStack>
       </Box>
