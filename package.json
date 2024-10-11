@@ -2,6 +2,7 @@
   "name": "app",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "icon": "./assets/images/logo.png",
   "scripts": {
     "start": "expo start",
     "dev": "expo start --android",

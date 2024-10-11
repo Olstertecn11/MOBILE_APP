@@ -9,6 +9,15 @@ export const getOrders = async () => {
   return handleRequest(() => api.get('/orders'));
 };
 
+export const getOrderItems = async (id) => {
+  return handleRequest(() => api.get(`/orders/${id}`));
+};
+
+export const updateOrderStatus = async (id, status) => {
+  return handleRequest(() => api.put(`/orders/${id}`, { status }));
+};
+
+
 // export const getAllusers = async () => {
 //   return handleRequest(() => api.get('/user'));
 // };

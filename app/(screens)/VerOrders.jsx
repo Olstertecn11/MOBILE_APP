@@ -2,26 +2,50 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { Box, Button, Actionsheet, useDisclose } from 'native-base';
-import { getOrders } from '../../services/order';
+import { updateOrderStatus, getOrders, getOrderItems } from '../../services/order';
 import { useIsFocused } from '@react-navigation/native';
 import Loader from '../../components/Loader';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
+import ViewOrder from '../../components/ViewOrder';
 
 const VerOrders = () => {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderDetails, setOrderDetails] = useState(null); // For storing order items
   const isFocused = useIsFocused();
   const { isOpen, onOpen, onClose } = useDisclose();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const updateOrder = async (status, id) => {
+    onClose();
+    const response = await updateOrderStatus(id, status);
+    if (response.status === 200) {
+      fetch();
+    }
+  }
 
   const fetch = async () => {
     setIsLoading(true);
     const response = await getOrders();
+    console.log(response);
     if (response.status === 200) {
       setOrders(response.data.orders);
     }
     setIsLoading(false);
   };
+
+  const getColorStatus = (status) => {
+    if (status === 'cancelado') {
+      return 'red.500';
+    }
+    if (status === 'proceso') {
+      return 'orange.500';
+    }
+    if (status === 'finalizado') {
+      return 'green.500';
+    }
+  }
 
   useEffect(() => {
     if (isFocused) {
@@ -32,6 +56,17 @@ const VerOrders = () => {
   const handleOptionsPress = (order) => {
     setSelectedOrder(order);
     onOpen();
+  };
+
+  const viewOrder = async (order_id) => {
+    const response = await getOrderItems(order_id);
+    if (response.status === 200) {
+      setOrderDetails({
+        order: selectedOrder,
+        items: response.data.items,
+      });
+      setIsModalOpen(true);
+    }
   };
 
   return (
@@ -45,7 +80,7 @@ const VerOrders = () => {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <Box bg={'gray.200'} mt={4} p={4} borderRadius={12}>
-              <Box bg={'green.400'} w={'40%'} p={'6px'} borderRadius={12} mb={2}>
+              <Box bg={getColorStatus(item.status)} w={'40%'} p={'6px'} borderRadius={12} mb={2}>
                 <Text style={styles.innerOrden}>Orden #{item.id}</Text>
               </Box>
               <Text style={styles.itemText}>Cliente: {item.client_name}</Text>
@@ -56,7 +91,7 @@ const VerOrders = () => {
                 top={'50%'}
                 bg='transparent'
                 _pressed={{ bg: 'gray.50' }}
-                onPress={() => handleOptionsPress(item)} // Trigger ActionSheet on press
+                onPress={() => handleOptionsPress(item)}
               >
                 <SimpleLineIcons name="options-vertical" size={20} color="gray" />
               </Button>
@@ -69,13 +104,26 @@ const VerOrders = () => {
 
       <Actionsheet isOpen={isOpen} onClose={onClose}>
         <Actionsheet.Content>
-          <Actionsheet.Item onPress={() => console.log('Visualizar:', selectedOrder)}>Visualizar</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => console.log('Pendiente:', selectedOrder)}>Pendiente</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => console.log('Proceso:', selectedOrder)}>Proceso</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => console.log('Finalizado:', selectedOrder)}>Finalizado</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => {
+            viewOrder(selectedOrder.id);
+            onClose();
+          }}>
+            Visualizar
+          </Actionsheet.Item>
+          <Actionsheet.Item onPress={() => updateOrder('cancelado', selectedOrder.id)}>Pendiente</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => updateOrder('proceso', selectedOrder.id)}>Proceso</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => updateOrder('finalizado', selectedOrder.id)}>Finalizado</Actionsheet.Item>
           <Actionsheet.Item onPress={onClose} color="red.500">Cancelar</Actionsheet.Item>
         </Actionsheet.Content>
       </Actionsheet>
+
+      {orderDetails && (
+        <ViewOrder
+          order={orderDetails}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </View>
   );
 };
@@ -109,4 +157,6 @@ const styles = StyleSheet.create({
 });
 
 export default VerOrders;
+
+
 
