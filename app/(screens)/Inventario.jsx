@@ -5,24 +5,30 @@ import { Actionsheet, useDisclose, Button } from 'native-base';
 import { getAllProducts, deleteProduct } from '../../services/product';
 import ViewProduct from '../../components/ViewProduct';
 import { useIsFocused } from '@react-navigation/native';
+import Loader from '../../components/Loader';
 
 const Inventario = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
+  const [allProducts, setAllProducts] = useState([]);
   const [sortedData, setSortedData] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclose();
   const isFocused = useIsFocused();
   const [isViewProductOpen, setIsViewProductOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const fetchProducts = async () => {
+    setLoading(true);
     try {
       const response = await getAllProducts();
+      setAllProducts(response.data);
       setSortedData(response.data);
     } catch (error) {
       Alert.alert('Error', 'Error fetching products');
       console.error(error);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -32,10 +38,14 @@ const Inventario = () => {
 
   const handleSearch = (query) => {
     setSearchQuery(query);
-    const filteredData = sortedData.filter(item =>
-      item.name.toLowerCase().includes(query.toLowerCase())
-    );
-    setSortedData(filteredData);
+    if (query) {
+      const filteredData = allProducts.filter(item =>
+        item.name.toLowerCase().includes(query.toLowerCase())
+      );
+      setSortedData(filteredData);
+    } else {
+      setSortedData(allProducts);
+    }
   };
 
   const handleSort = () => {
@@ -56,7 +66,9 @@ const Inventario = () => {
       const response = await deleteProduct(id);
       if (response.status === 200) {
         Alert.alert('Producto eliminado con éxito');
-        fetchProducts();
+        const updatedProducts = sortedData.filter(product => product.id !== id);  // Filtramos el producto eliminado
+        setSortedData(updatedProducts);  // Actualizamos la lista
+        setAllProducts(updatedProducts); // También actualizamos la copia
         onClose();
       }
     } catch (error) {
@@ -100,19 +112,25 @@ const Inventario = () => {
           onChangeText={handleSearch}
         />
       </View>
-      <FlatList
-        data={sortedData}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-        ListHeaderComponent={() => (
-          <View style={styles.header}>
-            <Text style={styles.headerCell}>Nombre</Text>
-            <Text style={styles.headerCell}>Cantidad</Text>
-            <Text style={styles.headerCell}>Precio</Text>
-            <Text style={styles.headerCell}>Acciones</Text>
-          </View>
-        )}
-      />
+      {loading && <Loader isLoading={loading} />}
+
+      {sortedData.length > 0 && !loading ? (
+        <FlatList
+          data={sortedData}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderItem}
+          ListHeaderComponent={() => (
+            <View style={styles.header}>
+              <Text style={styles.headerCell}>Nombre</Text>
+              <Text style={styles.headerCell}>Cantidad</Text>
+              <Text style={styles.headerCell}>Precio</Text>
+              <Text style={styles.headerCell}>Acciones</Text>
+            </View>
+          )}
+        />
+      ) : (
+        ''
+      )}
 
       <Actionsheet isOpen={isOpen} onClose={onClose}>
         <Actionsheet.Content>
