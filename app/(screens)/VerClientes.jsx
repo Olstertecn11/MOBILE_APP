@@ -22,7 +22,7 @@ const VerClientes = () => {
   const fetchClients = async () => {
     try {
       const response = await getAllclient();
-      if (response.status == 200) {
+      if (response.status === 200) {
         setClients(response.data);
         setFilteredClients(response.data);
       } else {
@@ -55,7 +55,7 @@ const VerClientes = () => {
       toast.show({ description: 'Modificar cliente', bgColor: 'yellow.500' });
     } else if (action === 'eliminar') {
       const r = await deleteClient(selectedClient.id);
-      if (r.status == 200 || r.status === 200) {
+      if (r.status === 200) {
         fetchClients();
         toast.show({ description: 'Eliminar cliente', bgColor: 'red.500' });
         onClose();
@@ -64,6 +64,11 @@ const VerClientes = () => {
       toast.show({ description: 'Error al eliminar cliente', bgColor: 'red.500' });
     }
     onClose();
+  };
+
+  const selectClientAndOpenActionsheet = (client) => {
+    setSelectedClient(client); // Asegura que seleccionas el cliente correcto
+    onOpen();
   };
 
   if (loading) {
@@ -95,7 +100,7 @@ const VerClientes = () => {
           <Button bg='green.500'><AntDesign name="search1" size={24} color="white" /></Button>
         </HStack>
       </Box>
-      <Box w="100%" bg="#fff" rounded="md" shadow={2}>
+      <Box w="100%" bg="#fff" rounded="md" shadow={2} mt={6}>
         <Text fontSize="lg" bold textAlign="center" mb={2} mt={2} bg='green.600' color='white'>Clientes</Text>
         <HStack justifyContent="space-between" bg="#f0f0f0" p={2}>
           <Text bold textAlign="center" flex={1}>Nombre</Text>
@@ -110,7 +115,7 @@ const VerClientes = () => {
             <HStack justifyContent="space-between" p={2} borderBottomWidth={1} borderBottomColor="gray.200">
               <Text textAlign='center' flex={1}>{item.name}</Text>
               <Text textAlign='center' flex={1}>{item.phone}</Text>
-              <Text textAlign='center' flex={1} onPress={() => { setSelectedClient(item); onOpen(); }}>
+              <Text textAlign='center' flex={1} onPress={() => selectClientAndOpenActionsheet(item)}>
                 ...
               </Text>
             </HStack>

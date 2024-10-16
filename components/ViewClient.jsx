@@ -68,7 +68,6 @@ const ViewClient = ({ isOpen, onClose, client, update }) => {
               <Text onPress={() => switchField('address')}>{currentClient.address || 'Haga clic para editar'}</Text>
             )}
 
-            {/* Teléfono */}
             <Text bold>Teléfono:</Text>
             {fields['phone'] ? (
               <Input
@@ -82,7 +81,6 @@ const ViewClient = ({ isOpen, onClose, client, update }) => {
               <Text onPress={() => switchField('phone')}>{currentClient.phone || 'Haga clic para editar'}</Text>
             )}
 
-            {/* Vendedor Asignado */}
             <Text bold>Vendedor Asignado:</Text>
             {fields['assigned_seller'] ? (
               <Input
