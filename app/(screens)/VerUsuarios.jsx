@@ -50,14 +50,14 @@ const VerUsuarios = () => {
   const handleAction = async (action) => {
     if (action === 'visualizar') {
       setIsViewModalOpen(true);
-    } else if (action === 'editar') {
-      toast.show({ description: 'Editar usuario', bgColor: 'yellow.500' });
     } else if (action === 'eliminar') {
       const resp = await deleteUser(selectedUser.id);
-      if (resp.status === 200 || resp.status == 200) {
+      if (resp.status === 200) {
         fetchUsers();
+        toast.show({ description: 'Usuario eliminado correctamente', bgColor: 'red.500' });
+      } else {
+        toast.show({ description: 'Error al eliminar usuario', bgColor: 'red.500' });
       }
-      toast.show({ description: 'Eliminar usuario', bgColor: 'red.500' });
     }
     onClose();
   };
@@ -118,7 +118,6 @@ const VerUsuarios = () => {
       <Actionsheet isOpen={isOpen} onClose={onClose}>
         <Actionsheet.Content>
           <Actionsheet.Item onPress={() => handleAction('visualizar')}>Visualizar</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => handleAction('editar')}>Editar</Actionsheet.Item>
           <Actionsheet.Item onPress={() => handleAction('eliminar')}>Eliminar</Actionsheet.Item>
         </Actionsheet.Content>
       </Actionsheet>
@@ -126,6 +125,7 @@ const VerUsuarios = () => {
       {selectedUser && (
         <ViewUser
           isOpen={isViewModalOpen}
+          onUpdate={fetchUsers}
           onClose={() => setIsViewModalOpen(false)}
           user={selectedUser}
         />
