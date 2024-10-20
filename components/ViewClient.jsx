@@ -1,12 +1,30 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast, Box, Input, Text, Button, Modal, VStack } from 'native-base';
 import { updateClient } from '../services/client';
 
 const ViewClient = ({ isOpen, onClose, client, update }) => {
-  const [currentClient, setCurrentClient] = React.useState(client);
+  const [currentClient, setCurrentClient] = useState({
+    name: '',
+    address: '',
+    phone: '',
+    assigned_seller: '',
+  });
+
+  const [fields, setFields] = useState({ name: false, address: false, phone: false, assigned_seller: false });
   const toast = useToast();
-  const [fields, setFields] = React.useState({ name: false, address: false, phone: false, assigned_seller: false });
+
+  // Sincronizar el estado con los datos del cliente cuando se abra el modal
+  useEffect(() => {
+    if (client) {
+      setCurrentClient({
+        name: client.name || '',
+        address: client.address || '',
+        phone: client.phone || '',
+        assigned_seller: client.assigned_seller || '',
+      });
+    }
+  }, [client]);
 
   const handleChange = (key, value) => {
     setCurrentClient((prev) => ({ ...prev, [key]: value }));
@@ -14,25 +32,28 @@ const ViewClient = ({ isOpen, onClose, client, update }) => {
 
   const switchField = (key) => {
     setFields((prev) => ({ ...prev, [key]: !prev[key] }));
-  }
+  };
 
   const updateUserData = async () => {
-    const response = await updateClient(client.id, currentClient);
-    console.log(response);
-    if (response.status === 200 || response.status == 200) {
-      toast.show({
-        title: 'Cliente actualizado',
-        status: 'success',
-      });
-    }
-    else {
+    try {
+      const response = await updateClient(client.id, currentClient);
+
+      if (response.status === 200) {
+        toast.show({
+          title: 'Cliente actualizado con éxito',
+          status: 'success',
+        });
+        update();
+        onClose();
+      } else {
+        throw new Error('Error al actualizar el cliente');
+      }
+    } catch (error) {
       toast.show({
         title: 'Error al actualizar el cliente',
         status: 'error',
       });
     }
-    update()
-    onClose();
   };
 
   return (

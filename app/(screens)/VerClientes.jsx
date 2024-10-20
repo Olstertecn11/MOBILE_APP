@@ -125,7 +125,7 @@ const VerClientes = () => {
 
       <Actionsheet isOpen={isOpen} onClose={onClose}>
         <Actionsheet.Content>
-          <Actionsheet.Item onPress={() => handleAction('visualizar')}>Visualizar</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => handleAction('visualizar')}>{selectedClient && (selectedClient.name)}Visualizar</Actionsheet.Item>
           <Actionsheet.Item onPress={() => handleAction('eliminar')}>Eliminar</Actionsheet.Item>
         </Actionsheet.Content>
       </Actionsheet>
