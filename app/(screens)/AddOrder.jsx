@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useToast, Box, Select, Text, HStack, Button, IconButton, CloseIcon } from 'native-base';
+import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { ScrollView, VStack, useToast, Box, Select, Text, HStack, Button, IconButton, CloseIcon } from 'native-base';
 import { getAllProducts } from '../../services/product';
 import { useIsFocused } from '@react-navigation/native';
 import { getAllclient } from '../../services/client';
@@ -214,21 +214,25 @@ export default function AddOrder() {
           }}
         />
 
-        <ScrollView style={styles.scrollView}>
-          {productosEncontrados.length > 0 ? (
-            productosEncontrados.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.productoEncontrado}
-                onPress={() => agregarProducto(item)}
-              >
-                <Text>{item.name}</Text>
-                <Text>Precio: Q {item.unit_price}</Text>
-              </TouchableOpacity>
-            ))
-          ) : (
-            <Text style={styles.noProductos}>No se encontraron productos</Text>
-          )}
+
+        <Text>Productos: {productosEncontrados && (productosEncontrados.length)}</Text>
+        <ScrollView style={styles.scrollView} nestedScrollEnabled={true} p={4}>
+          <VStack>
+            {productosEncontrados.length > 0 ? (
+              productosEncontrados.map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.productoEncontrado}
+                  onPress={() => agregarProducto(item)}
+                >
+                  <Text>{item.name}</Text>
+                  <Text>Precio: Q {item.unit_price}</Text>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <Text style={styles.noProductos}>No se encontraron productos</Text>
+            )}
+          </VStack>
         </ScrollView>
 
         <Text style={styles.label}>Método de pago</Text>
@@ -240,6 +244,7 @@ export default function AddOrder() {
         />
 
         <Text style={styles.total}>Productos Agregados</Text>
+
         {productosPedido.length > 0 ? (
           productosPedido.map((producto, index) => (
             <Box key={index} bg='muted.50' p={4} borderRadius={'12px'} >
@@ -306,7 +311,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FDFDFD',
   },
   scrollView: {
-    maxHeight: 350,
+    maxHeight: 250,
     minHeight: 250,
     height: 'auto',
     padding: 10,
