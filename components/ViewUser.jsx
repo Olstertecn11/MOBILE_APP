@@ -1,19 +1,40 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Text, Button, Modal, VStack, Input, useToast } from 'native-base';
 import { updateUser } from '../services/user'; // Servicio para actualizar usuario
 
 const ViewUser = ({ isOpen, onClose, user, onUpdate }) => {
-  const [username, setUsername] = useState(user.username);
-  const [email, setEmail] = useState(user.email);
-  const [roleId, setRoleId] = useState(user.role_id);
+  const [form, setForm] = useState({
+    username: '',
+    email: '',
+    roleId: '',
+  });
+
   const toast = useToast();
+
+  useEffect(() => {
+    if (user) {
+      setForm({
+        username: user.username || '',
+        email: user.email || '',
+        roleId: user.role_id || '',
+      });
+    }
+  }, [user]);
+
+  const handleInputChange = (key, value) => {
+    setForm({ ...form, [key]: value });
+  };
 
   const handleUpdateUser = async () => {
     try {
-      const updatedData = { username, email, role_id: roleId };
+      const updatedData = {
+        username: form.username,
+        email: form.email,
+        role_id: form.roleId
+      };
       const response = await updateUser(user.id, updatedData);
-      console.log(response);
+
       if (response.status === 200) {
         onClose();
         toast.show({
@@ -25,7 +46,6 @@ const ViewUser = ({ isOpen, onClose, user, onUpdate }) => {
         throw new Error('Error actualizando el usuario');
       }
     } catch (error) {
-      onUpdate();
       toast.show({
         title: 'Error al actualizar el usuario',
         status: 'error',
@@ -37,19 +57,25 @@ const ViewUser = ({ isOpen, onClose, user, onUpdate }) => {
     <Modal isOpen={isOpen} onClose={onClose}>
       <Modal.Content maxWidth="400px">
         <Modal.CloseButton />
-        <Modal.Header>Visualización</Modal.Header>
+        <Modal.Header>Modificar Usuario</Modal.Header>
         <Modal.Body>
           <VStack space={4}>
             <Text bold>Nombre de usuario:</Text>
-            <Input value={username} onChangeText={setUsername} />
+            <Input
+              value={form.username}
+              onChangeText={(value) => handleInputChange('username', value)}
+            />
 
             <Text bold>Correo electrónico:</Text>
-            <Input value={email} onChangeText={setEmail} />
+            <Input
+              value={form.email}
+              onChangeText={(value) => handleInputChange('email', value)}
+            />
 
             <Text bold>Rol:</Text>
             <Input
-              value={roleId === 1 ? 'Administrador' : 'Vendedor'}
-              onChangeText={(text) => setRoleId(text === 'Administrador' ? 1 : 2)}
+              value={form.roleId === 1 ? 'Administrador' : 'Vendedor'}
+              onChangeText={(value) => handleInputChange('roleId', value === 'Administrador' ? 1 : 2)}
             />
           </VStack>
         </Modal.Body>
@@ -57,7 +83,9 @@ const ViewUser = ({ isOpen, onClose, user, onUpdate }) => {
           <Button bg="green.500" onPress={handleUpdateUser}>
             Guardar
           </Button>
-          <Button onPress={onClose} ml={2}>Cerrar</Button>
+          <Button onPress={onClose} ml={2}>
+            Cerrar
+          </Button>
         </Modal.Footer>
       </Modal.Content>
     </Modal>
@@ -65,3 +93,4 @@ const ViewUser = ({ isOpen, onClose, user, onUpdate }) => {
 };
 
 export default ViewUser;
+
