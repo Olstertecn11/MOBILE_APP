@@ -14,6 +14,11 @@ export default function LoginScreen() {
     router.replace('/Home');
   };
 
+  const handleRecovery = () => {
+    alert("fkjslj")
+    // router.push('hidden/PasswordRecovery');
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
@@ -36,8 +41,8 @@ export default function LoginScreen() {
         <Text style={styles.buttonText}>Ingresar</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.buttonSecondary}>
-        <Text style={styles.buttonText}>Olvidé mi contraseña</Text>
+      <TouchableOpacity style={styles.buttonSecondary} onPress={handleRecovery}>
+        <Text style={styles.buttonText} >Olvidé mi contraseña</Text>
       </TouchableOpacity>
     </View>
   );
