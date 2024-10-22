@@ -163,7 +163,9 @@ export default function AddOrder() {
     if (response.status === 201 || response.status == 201) {
       showCustomToast('Pedido realizado con éxito', 'green.500');
       setLoading(false);
-      alert('Pedido realizado con éxito');
+      setTimeout(() => {
+        handleCancel();
+      }, 1000);
       return;
     }
 
