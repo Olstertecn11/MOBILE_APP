@@ -5,6 +5,9 @@ import { VStack, FormControl, Input, Button, Select, CheckIcon, Center, Box, Tex
 import { createUser } from '../../services/user';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from '@react-navigation/native';
+import Entypo from '@expo/vector-icons/Entypo';
+
+
 
 const AddUser = () => {
   const [nombre, setNombre] = useState('');
@@ -109,7 +112,7 @@ const AddUser = () => {
               <Select.Item label="Vendedor" value="vendedor" />
             </Select>
           </FormControl>
-          {canAdd &&
+          {canAdd && canAdd ?
             <Button
               mt="2"
               colorScheme="green"
@@ -118,6 +121,9 @@ const AddUser = () => {
             >
               Agregar usuario
             </Button>
+            :
+            <Text color='red.600'>No tienes privilegios suficientes para esta acción <Entypo name="emoji-sad" size={18} color="red" /></Text>
+
           }
         </VStack>
       </Box>
