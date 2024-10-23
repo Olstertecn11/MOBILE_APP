@@ -247,25 +247,27 @@ export default function AddOrder() {
 
         <Text style={styles.total}>Productos Agregados</Text>
 
-        {productosPedido.length > 0 ? (
-          productosPedido.map((producto, index) => (
-            <Box key={index} bg='muted.50' p={4} borderRadius={'12px'} >
-              <Text style={styles.productoAgregado}>
-                {producto.name} -  unidades({producto.quantity}) - Q.{producto.unit_price * producto.quantity}
-              </Text>
-              <HStack space={2}>
-                <Button _pressed={{ bg: 'gray.50' }} bg='transparent' onPress={() => actualizarCantidadProducto(producto.id, 1)}>
-                  <AntDesign name="pluscircle" size={24} color="green" />
-                </Button>
-                <Button _pressed={{ bg: 'gray.50' }} bg='transparent' onPress={() => actualizarCantidadProducto(producto.id, -1)}>
-                  <AntDesign name="minuscircle" size={24} color="red" />
-                </Button>
-              </HStack>
-            </Box>
-          ))
-        ) : (
-          <Text style={styles.noProductos}>No hay productos agregados</Text>
-        )}
+        <ScrollView nestedScrollEnabled={true} h={80} pb={2}>
+          {productosPedido.length > 0 ? (
+            productosPedido.map((producto, index) => (
+              <Box key={index} bg='muted.50' p={4} borderRadius={'12px'} mt={2} >
+                <Text style={styles.productoAgregado}>
+                  {producto.name} -  unidades({producto.quantity}) - Q.{producto.unit_price * producto.quantity}
+                </Text>
+                <HStack space={2}>
+                  <Button _pressed={{ bg: 'gray.50' }} bg='transparent' onPress={() => actualizarCantidadProducto(producto.id, 1)}>
+                    <AntDesign name="pluscircle" size={24} color="green" />
+                  </Button>
+                  <Button _pressed={{ bg: 'gray.50' }} bg='transparent' onPress={() => actualizarCantidadProducto(producto.id, -1)}>
+                    <AntDesign name="minuscircle" size={24} color="red" />
+                  </Button>
+                </HStack>
+              </Box>
+            ))
+          ) : (
+            <Text style={styles.noProductos}>No hay productos agregados</Text>
+          )}
+        </ScrollView>
 
         <Text style={styles.total}>Precio total</Text>
         <Text style={styles.totalAmount}>Q.{precioTotal.toFixed(2)}</Text>
