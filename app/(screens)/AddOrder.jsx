@@ -57,6 +57,7 @@ export default function AddOrder() {
     const response = await getAllProducts();
     if (response.status === 200 || response.status == 200 || response.status === 201) {
       setPrds(response.data);
+      console.log(response.data);
       setProductosEncontrados(response.data);
     }
   }
@@ -91,19 +92,25 @@ export default function AddOrder() {
         if (producto.id === productoId) {
           const nuevaCantidad = producto.quantity + incremento;
 
-          nuevoPrecioTotal += producto.unit_price * incremento;
-
-          if (nuevaCantidad > 0) {
-            return { ...producto, quantity: nuevaCantidad };
+          if (nuevaCantidad < 1) {
+            nuevoPrecioTotal -= producto.unit_price * producto.quantity;
+            return null;
           }
-          return null;
+
+          const productoOriginal = prds.find(p => p.id === productoId);
+          if (nuevaCantidad > productoOriginal.quantity) {
+            showCustomToast(`No hay suficientes existencias. Disponible: ${productoOriginal.quantity}`, 'red.500');
+            return producto;
+          }
+
+          nuevoPrecioTotal += producto.unit_price * incremento;
+          return { ...producto, quantity: nuevaCantidad };
         }
         return producto;
       })
       .filter(producto => producto !== null);
 
     setProductosPedido(nuevosProductosPedido);
-
     setPrecioTotal(nuevoPrecioTotal);
 
     const productosFiltrados = prds.filter(p => !nuevosProductosPedido.some(pedido => pedido.id === p.id));
