@@ -78,10 +78,18 @@ export default function Layout() {
           options={{ title: 'Usuarios' }}
         />
 
-
         <Drawer.Screen
           name="VerOrders"
           options={{ title: 'Ordenes' }}
+        />
+
+        <Drawer.Screen
+          name="Inventario"
+          options={{ title: 'Inventario' }}
+        />
+        <Drawer.Screen
+          name="Stats"
+          options={{ title: 'Estadísticas' }}
         />
       </Drawer>
     </GestureHandlerRootView>

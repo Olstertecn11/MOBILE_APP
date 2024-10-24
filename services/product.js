@@ -21,3 +21,9 @@ export const deleteProduct = async (id) => {
   return handleRequest(() => api.delete(`/product/${id}`));
 };
 
+
+export const getStats = async () => {
+  return handleRequest(() => api.get(`/stats`));
+};
+
+
