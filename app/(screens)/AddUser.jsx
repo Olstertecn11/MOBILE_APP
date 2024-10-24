@@ -3,12 +3,36 @@
 import React, { useState } from 'react';
 import { VStack, FormControl, Input, Button, Select, CheckIcon, Center, Box, Text, useToast } from 'native-base';
 import { createUser } from '../../services/user';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useIsFocused } from '@react-navigation/native';
+import Entypo from '@expo/vector-icons/Entypo';
+
+
 
 const AddUser = () => {
   const [nombre, setNombre] = useState('');
   const [rol, setRol] = useState('');
   const [loading, setLoading] = useState(false);
   const toast = useToast();
+  const isFocused = useIsFocused();
+  const [canAdd, setCanAdd] = React.useState(true);
+
+  const checkRoles = async () => {
+    const user = await AsyncStorage.getItem('user');
+    const _user = JSON.parse(user);
+    console.log(_user.role_id)
+    if (_user.role_id > 1) {
+      setCanAdd(false);
+      return;
+    }
+  }
+
+
+  React.useEffect(() => {
+    if (isFocused) {
+      checkRoles();
+    }
+  }, [isFocused]);
 
   const handleAgregarUsuario = async () => {
     if (!nombre || !rol) {
@@ -88,15 +112,19 @@ const AddUser = () => {
               <Select.Item label="Vendedor" value="vendedor" />
             </Select>
           </FormControl>
+          {canAdd && canAdd ?
+            <Button
+              mt="2"
+              colorScheme="green"
+              isLoading={loading}
+              onPress={handleAgregarUsuario}
+            >
+              Agregar usuario
+            </Button>
+            :
+            <Text color='red.600'>No tienes privilegios suficientes para esta acción <Entypo name="emoji-sad" size={18} color="red" /></Text>
 
-          <Button
-            mt="2"
-            colorScheme="green"
-            isLoading={loading}
-            onPress={handleAgregarUsuario}
-          >
-            Agregar usuario
-          </Button>
+          }
         </VStack>
       </Box>
     </Center>

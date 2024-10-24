@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useToast, Box, Select, Text, HStack, Button, IconButton, CloseIcon } from 'native-base';
+import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { ScrollView, VStack, useToast, Box, Select, Text, HStack, Button, IconButton, CloseIcon } from 'native-base';
 import { getAllProducts } from '../../services/product';
 import { useIsFocused } from '@react-navigation/native';
 import { getAllclient } from '../../services/client';
@@ -163,7 +163,9 @@ export default function AddOrder() {
     if (response.status === 201 || response.status == 201) {
       showCustomToast('Pedido realizado con éxito', 'green.500');
       setLoading(false);
-      alert('Pedido realizado con éxito');
+      setTimeout(() => {
+        handleCancel();
+      }, 1000);
       return;
     }
 
@@ -214,21 +216,25 @@ export default function AddOrder() {
           }}
         />
 
-        <ScrollView style={styles.scrollView}>
-          {productosEncontrados.length > 0 ? (
-            productosEncontrados.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.productoEncontrado}
-                onPress={() => agregarProducto(item)}
-              >
-                <Text>{item.name}</Text>
-                <Text>Precio: Q {item.unit_price}</Text>
-              </TouchableOpacity>
-            ))
-          ) : (
-            <Text style={styles.noProductos}>No se encontraron productos</Text>
-          )}
+
+        <Text>Productos: {productosEncontrados && (productosEncontrados.length)}</Text>
+        <ScrollView style={styles.scrollView} nestedScrollEnabled={true} p={4}>
+          <VStack>
+            {productosEncontrados.length > 0 ? (
+              productosEncontrados.map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.productoEncontrado}
+                  onPress={() => agregarProducto(item)}
+                >
+                  <Text>{item.name}</Text>
+                  <Text>Precio: Q {item.unit_price}</Text>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <Text style={styles.noProductos}>No se encontraron productos</Text>
+            )}
+          </VStack>
         </ScrollView>
 
         <Text style={styles.label}>Método de pago</Text>
@@ -240,25 +246,28 @@ export default function AddOrder() {
         />
 
         <Text style={styles.total}>Productos Agregados</Text>
-        {productosPedido.length > 0 ? (
-          productosPedido.map((producto, index) => (
-            <Box key={index} bg='muted.50' p={4} borderRadius={'12px'} >
-              <Text style={styles.productoAgregado}>
-                {producto.name} -  unidades({producto.quantity}) - Q.{producto.unit_price * producto.quantity}
-              </Text>
-              <HStack space={2}>
-                <Button _pressed={{ bg: 'gray.50' }} bg='transparent' onPress={() => actualizarCantidadProducto(producto.id, 1)}>
-                  <AntDesign name="pluscircle" size={24} color="green" />
-                </Button>
-                <Button _pressed={{ bg: 'gray.50' }} bg='transparent' onPress={() => actualizarCantidadProducto(producto.id, -1)}>
-                  <AntDesign name="minuscircle" size={24} color="red" />
-                </Button>
-              </HStack>
-            </Box>
-          ))
-        ) : (
-          <Text style={styles.noProductos}>No hay productos agregados</Text>
-        )}
+
+        <ScrollView nestedScrollEnabled={true} h={80} pb={2}>
+          {productosPedido.length > 0 ? (
+            productosPedido.map((producto, index) => (
+              <Box key={index} bg='muted.50' p={4} borderRadius={'12px'} mt={2} >
+                <Text style={styles.productoAgregado}>
+                  {producto.name} -  unidades({producto.quantity}) - Q.{producto.unit_price * producto.quantity}
+                </Text>
+                <HStack space={2}>
+                  <Button _pressed={{ bg: 'gray.50' }} bg='transparent' onPress={() => actualizarCantidadProducto(producto.id, 1)}>
+                    <AntDesign name="pluscircle" size={24} color="green" />
+                  </Button>
+                  <Button _pressed={{ bg: 'gray.50' }} bg='transparent' onPress={() => actualizarCantidadProducto(producto.id, -1)}>
+                    <AntDesign name="minuscircle" size={24} color="red" />
+                  </Button>
+                </HStack>
+              </Box>
+            ))
+          ) : (
+            <Text style={styles.noProductos}>No hay productos agregados</Text>
+          )}
+        </ScrollView>
 
         <Text style={styles.total}>Precio total</Text>
         <Text style={styles.totalAmount}>Q.{precioTotal.toFixed(2)}</Text>
@@ -306,7 +315,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FDFDFD',
   },
   scrollView: {
-    maxHeight: 350,
+    maxHeight: 250,
     minHeight: 250,
     height: 'auto',
     padding: 10,

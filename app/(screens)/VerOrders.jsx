@@ -111,9 +111,9 @@ const VerOrders = () => {
           }}>
             Visualizar
           </Actionsheet.Item>
-          <Actionsheet.Item onPress={() => updateOrder('cancelado', selectedOrder.id)}>Pendiente</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => updateOrder('proceso', selectedOrder.id)}>Proceso</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => updateOrder('finalizado', selectedOrder.id)}>Finalizado</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => updateOrder('cancelado', selectedOrder.id)}>Cancelado</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => updateOrder('proceso', selectedOrder.id)}>Pendiente</Actionsheet.Item>
+          <Actionsheet.Item onPress={() => updateOrder('finalizado', selectedOrder.id)}>Entregado</Actionsheet.Item>
           <Actionsheet.Item onPress={onClose} color="red.500">Cancelar</Actionsheet.Item>
         </Actionsheet.Content>
       </Actionsheet>

@@ -114,7 +114,7 @@ const Inventario = () => {
       </View>
       {loading && <Loader isLoading={loading} />}
 
-      {sortedData.length > 0 && !loading ? (
+      {sortedData && sortedData.length > 0 && !loading ? (
         <FlatList
           data={sortedData}
           keyExtractor={(item) => item.id.toString()}

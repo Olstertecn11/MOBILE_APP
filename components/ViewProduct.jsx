@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button, VStack, Image, Text, Input, ScrollView } from 'native-base';
 import { TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
@@ -8,11 +8,22 @@ import { updateProduct } from '../services/product';
 
 const ViewProduct = ({ isOpen, onClose, product, refreshInventory }) => {
   const [form, setForm] = useState({
-    name: product?.name || '',
-    quantity: product?.quantity,
-    unit_price: product?.unit_price || '',
-    imageBase64: product?.image || null,
+    name: '',
+    quantity: '',
+    unit_price: '',
+    imageBase64: null,
   });
+
+  useEffect(() => {
+    if (product) {
+      setForm({
+        name: product.name || '',
+        quantity: product.quantity || '',
+        unit_price: product.unit_price || '',
+        imageBase64: product.image || null,
+      });
+    }
+  }, [product]);
 
   const handleInputChange = (key, value) => {
     setForm({ ...form, [key]: value });
@@ -56,7 +67,7 @@ const ViewProduct = ({ isOpen, onClose, product, refreshInventory }) => {
 
       const response = await updateProduct(product.id, updatedProduct);
       console.log('response', response);
-      if (response.status == 200 && response.status === 200) {
+      if (response.status === 200) {
         alert('Producto actualizado con éxito');
         refreshInventory();
         onClose();
@@ -73,38 +84,35 @@ const ViewProduct = ({ isOpen, onClose, product, refreshInventory }) => {
         <Modal.Header>Modificar Producto</Modal.Header>
         <Modal.Body>
           <ScrollView>
-            {
-              form &&
-              <VStack space={4} alignItems="center">
-                <Input
-                  placeholder="Nombre del producto"
-                  value={form.name}
-                  onChangeText={(value) => handleInputChange('name', value)}
+            <VStack space={4} alignItems="center">
+              <Input
+                placeholder="Nombre del producto"
+                value={form.name}
+                onChangeText={(value) => handleInputChange('name', value)}
+              />
+              <Input
+                placeholder="Cantidad"
+                value={form.quantity.toString()}
+                onChangeText={(value) => handleInputChange('quantity', value)}
+              />
+              <Input
+                placeholder="Precio Unitario"
+                value={form.unit_price}
+                keyboardType="numeric"
+                onChangeText={(value) => handleInputChange('unit_price', value)}
+              />
+              <TouchableOpacity onPress={selectImage}>
+                <Text style={{ color: 'green', marginBottom: 10 }}>Cambiar Imagen</Text>
+              </TouchableOpacity>
+              {form.imageBase64 && (
+                <Image
+                  source={{ uri: `data:image/jpeg;base64,${form.imageBase64}` }}
+                  alt="Imagen del producto"
+                  size="2xl"
+                  borderRadius={10}
                 />
-                <Input
-                  placeholder="Cantidad"
-                  value={form.quantity.toString()}
-                  onChangeText={(value) => handleInputChange('quantity', value)}
-                />
-                <Input
-                  placeholder="Precio Unitario"
-                  value={form.unit_price}
-                  keyboardType="numeric"
-                  onChangeText={(value) => handleInputChange('unit_price', value)}
-                />
-                <TouchableOpacity onPress={selectImage}>
-                  <Text style={{ color: 'green', marginBottom: 10 }}>Cambiar Imagen</Text>
-                </TouchableOpacity>
-                {form.imageBase64 && (
-                  <Image
-                    source={{ uri: `data:image/jpeg;base64,${form.imageBase64}` }}
-                    alt="Imagen del producto"
-                    size="2xl"
-                    borderRadius={10}
-                  />
-                )}
-              </VStack>
-            }
+              )}
+            </VStack>
           </ScrollView>
         </Modal.Body>
         <Modal.Footer>

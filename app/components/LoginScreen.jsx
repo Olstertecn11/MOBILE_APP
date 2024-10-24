@@ -30,6 +30,11 @@ export default function LoginScreen() {
     });
   };
 
+
+  const handleRecovery = () => {
+    router.push('hidden/PasswordRecovery');
+
+  }
   const handleLogin = async () => {
     console.log('enter here');
     setLoading(true);
@@ -107,7 +112,7 @@ export default function LoginScreen() {
             Ingresar
           </Button>
 
-          <Button w="80%" variant="outline" colorScheme="green">
+          <Button w="80%" variant="outline" colorScheme="green" onPress={handleRecovery}>
             Olvidé mi contraseña
           </Button>
         </>
