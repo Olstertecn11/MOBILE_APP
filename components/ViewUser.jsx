@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Box, Text, Button, Modal, VStack, Input, useToast } from 'native-base';
-import { updateUser } from '../services/user'; // Servicio para actualizar usuario
+import { updateUser } from '../services/user';
 
-const ViewUser = ({ isOpen, onClose, user, onUpdate }) => {
+const ViewUser = ({ isOpen, onClose, user, onUpdate, canManage }) => {
   const [form, setForm] = useState({
     username: '',
     email: '',
@@ -80,9 +80,12 @@ const ViewUser = ({ isOpen, onClose, user, onUpdate }) => {
           </VStack>
         </Modal.Body>
         <Modal.Footer>
-          <Button bg="green.500" onPress={handleUpdateUser}>
-            Guardar
-          </Button>
+          {canManage && canManage ? (
+            <Button bg="green.500" onPress={handleUpdateUser}>
+              Guardar
+            </Button>
+          ) : <Text color='red.600'>No tienes privilegios suficientes para esta acción <Entypo name="emoji-sad" size={18} color="red" /></Text>
+          }
           <Button onPress={onClose} ml={2}>
             Cerrar
           </Button>

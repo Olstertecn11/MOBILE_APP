@@ -5,6 +5,8 @@ import { getAllusers, deleteUser } from '../../services/user';
 import { useIsFocused } from '@react-navigation/native';
 import ViewUser from '../../components/ViewUser';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Entypo from '@expo/vector-icons/Entypo';
 
 const VerUsuarios = () => {
   const [users, setUsers] = useState([]);
@@ -17,6 +19,19 @@ const VerUsuarios = () => {
   const toast = useToast();
   const isFocused = useIsFocused();
   const { isOpen, onOpen, onClose } = useDisclose();
+  const [canManage, setCanManage] = useState(true);
+
+  const checkRoles = async () => {
+    const user = await AsyncStorage.getItem('user');
+    const _user = JSON.parse(user);
+    console.log(_user.role_id)
+    if (_user.role_id > 1) {
+      setCanAdd(false);
+      return;
+    }
+  }
+
+
 
   const fetchUsers = async () => {
     try {
@@ -35,7 +50,10 @@ const VerUsuarios = () => {
   };
 
   useEffect(() => {
-    if (isFocused) fetchUsers();
+    if (isFocused) {
+      fetchUsers();
+      checkRoles();
+    }
   }, [isFocused]);
 
   const handleSearch = (text) => {
@@ -118,7 +136,11 @@ const VerUsuarios = () => {
       <Actionsheet isOpen={isOpen} onClose={onClose}>
         <Actionsheet.Content>
           <Actionsheet.Item onPress={() => handleAction('visualizar')}>Visualizar</Actionsheet.Item>
-          <Actionsheet.Item onPress={() => handleAction('eliminar')}>Eliminar</Actionsheet.Item>
+          {canManage && canManage ? (
+
+            <Actionsheet.Item onPress={() => handleAction('eliminar')}>Eliminar</Actionsheet.Item>
+          ) : <Text color='red.600'>No tienes privilegios suficientes para esta acción <Entypo name="emoji-sad" size={18} color="red" /></Text>
+          }
         </Actionsheet.Content>
       </Actionsheet>
 
@@ -128,6 +150,7 @@ const VerUsuarios = () => {
           onUpdate={fetchUsers}
           onClose={() => setIsViewModalOpen(false)}
           user={selectedUser}
+          canManage={canManage}
         />
       )}
     </Box>
