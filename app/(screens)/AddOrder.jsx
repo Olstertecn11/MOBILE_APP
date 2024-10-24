@@ -161,7 +161,8 @@ export default function AddOrder() {
         quantity: producto.quantity,
         unit_price: producto.unit_price,
         total: producto.unit_price * producto.quantity
-      }))
+      })),
+      direction: direccion
     };
 
     const response = await createOrder(pedido);

@@ -17,7 +17,7 @@ const ViewOrder = ({ order, isOpen, onClose, orderColor }) => {
             <Text>Cliente: {order?.order.client_name}</Text>
             <Text>Fecha de la orden: {new Date(order?.order.order_date).toLocaleDateString()}</Text>
             <Text>Estado: {order?.order.status}</Text>
-            <Text>Dirección: {order?.order.address}</Text>
+            <Text>Dirección: {order?.order.direction}</Text>
             <Text>Total: Q.{order?.order.total}</Text>
           </VStack>
 
