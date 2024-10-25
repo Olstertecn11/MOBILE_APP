@@ -80,12 +80,9 @@ const ViewUser = ({ isOpen, onClose, user, onUpdate, canManage }) => {
           </VStack>
         </Modal.Body>
         <Modal.Footer>
-          {canManage && canManage ? (
-            <Button bg="green.500" onPress={handleUpdateUser}>
-              Guardar
-            </Button>
-          ) : <Text color='red.600'>No tienes privilegios suficientes para esta acción <Entypo name="emoji-sad" size={18} color="red" /></Text>
-          }
+          <Button bg="green.500" onPress={handleUpdateUser}>
+            Guardar
+          </Button>
           <Button onPress={onClose} ml={2}>
             Cerrar
           </Button>

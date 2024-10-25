@@ -6,7 +6,6 @@ import { useIsFocused } from '@react-navigation/native';
 import ViewUser from '../../components/ViewUser';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Entypo from '@expo/vector-icons/Entypo';
 
 const VerUsuarios = () => {
   const [users, setUsers] = useState([]);
@@ -26,7 +25,7 @@ const VerUsuarios = () => {
     const _user = JSON.parse(user);
     console.log(_user.role_id)
     if (_user.role_id > 1) {
-      setCanAdd(false);
+      setCanManage(false);
       return;
     }
   }
@@ -135,12 +134,15 @@ const VerUsuarios = () => {
 
       <Actionsheet isOpen={isOpen} onClose={onClose}>
         <Actionsheet.Content>
-          <Actionsheet.Item onPress={() => handleAction('visualizar')}>Visualizar</Actionsheet.Item>
           {canManage && canManage ? (
-
-            <Actionsheet.Item onPress={() => handleAction('eliminar')}>Eliminar</Actionsheet.Item>
-          ) : <Text color='red.600'>No tienes privilegios suficientes para esta acción <Entypo name="emoji-sad" size={18} color="red" /></Text>
+            <Actionsheet.Item onPress={() => handleAction('visualizar')}>Visualizar</Actionsheet.Item>
+          ) : <Text color='red.700'>Sin privilegios</Text>
           }
+          {canManage && canManage ? (
+            <Actionsheet.Item onPress={() => handleAction('eliminar')}>Eliminar</Actionsheet.Item>
+          ) : ''
+          }
+          <Actionsheet.Item onPress={() => onClose()}>Cancelar</Actionsheet.Item>
         </Actionsheet.Content>
       </Actionsheet>
 
