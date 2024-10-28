@@ -22,8 +22,7 @@ export const deleteProduct = async (id) => {
 };
 
 
-export const getStats = async () => {
-  return handleRequest(() => api.get(`/stats`));
+export const getStats = async (fecha) => {
+  return handleRequest(() => api.get(`/stats`, { params: { fecha } }));
 };
-
 

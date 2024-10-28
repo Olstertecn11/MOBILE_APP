@@ -1,6 +1,6 @@
 
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { CircularProgress } from 'react-native-circular-progress';
 import { getStats } from "../../services/product";
 import { useIsFocused } from '@react-navigation/native';
@@ -12,10 +12,13 @@ const Stats = () => {
   const [topPlants, setTopPlants] = React.useState([]);
 
   const getStatsFetch = async () => {
-    const response = await getStats();
+    const currentDate = new Date();
+    const formattedDate = `${String(currentDate.getMonth() + 1).padStart(2, '0')}-${currentDate.getFullYear()}`;
+    const response = await getStats(formattedDate);
+    console.log(response.data);
     setMonthGains(response.data.ganancias[0].total_ganancias);
     setMonthOrders(response.data.mensualOrders[0].ordenes);
-    setTopPlants(response.data.topPlantas);
+    setTopPlants(response.data.topPlantas[0]);
   };
 
   React.useEffect(() => {
@@ -30,66 +33,69 @@ const Stats = () => {
   });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.progressContainer}>
-        <CircularProgress
-          size={260}
-          width={15}
-          fill={monthGains / 2000 * 100}
-          tintColor="#32CD32"
-          backgroundColor="#e0e0e0"
-        >
-          {() => (
-            <View style={styles.centerText}>
-              <Text style={styles.gananciasText}>Q{formattedMonthGains}</Text>
-              <Text style={styles.subText}>Ganancias</Text>
-            </View>
-          )}
-        </CircularProgress>
-      </View>
+    <ScrollView >
+      <View style={styles.container}>
 
-      <View style={styles.plantsContainer}>
-        <Text style={styles.title}>Top 5 plantas</Text>
-        {topPlants.map((plant, index) => (
-          <Text key={index} style={styles.plantText}>
-            {index + 1}. {plant.name} {plant.total_vendido}
-          </Text>
-        ))}
-
-        <View style={styles.smallProgressContainer}>
+        <View style={styles.progressContainer}>
           <CircularProgress
-            size={60}
-            width={5}
-            fill={70}
+            size={260}
+            width={15}
+            fill={monthGains / 2000 * 100}
             tintColor="#32CD32"
             backgroundColor="#e0e0e0"
           >
             {() => (
               <View style={styles.centerText}>
-                <Text style={styles.subText}>70%</Text>
+                <Text style={styles.gananciasText}>Q{formattedMonthGains}</Text>
+                <Text style={styles.subText}>Ganancias</Text>
+              </View>
+            )}
+          </CircularProgress>
+        </View>
+
+        <View style={styles.plantsContainer}>
+          <Text style={styles.title}>Top 5 plantas</Text>
+          {topPlants.map((plant, index) => (
+            <Text key={index} style={styles.plantText}>
+              {index + 1}. {plant.name} {plant.total_vendido}
+            </Text>
+          ))}
+
+          <View style={styles.smallProgressContainer}>
+            <CircularProgress
+              size={60}
+              width={5}
+              fill={70}
+              tintColor="#32CD32"
+              backgroundColor="#e0e0e0"
+            >
+              {() => (
+                <View style={styles.centerText}>
+                  <Text style={styles.subText}>70%</Text>
+                </View>
+              )}
+            </CircularProgress>
+          </View>
+        </View>
+
+        <View style={styles.smallProgressContainer}>
+          <CircularProgress
+            size={120}
+            width={4}
+            fill={monthOrders / 50 * 100}
+            tintColor="#32CD32"
+            backgroundColor="#e0e0e0"
+          >
+            {() => (
+              <View style={styles.centerText}>
+                <Text style={styles.pedidosText}>{monthOrders}</Text>
+                <Text style={styles.subText}>Pedidos Mensuales</Text>
               </View>
             )}
           </CircularProgress>
         </View>
       </View>
-
-      <View style={styles.smallProgressContainer}>
-        <CircularProgress
-          size={120}
-          width={4}
-          fill={monthOrders / 50 * 100}
-          tintColor="#32CD32"
-          backgroundColor="#e0e0e0"
-        >
-          {() => (
-            <View style={styles.centerText}>
-              <Text style={styles.pedidosText}>{monthOrders}</Text>
-              <Text style={styles.subText}>Pedidos Mensuales</Text>
-            </View>
-          )}
-        </CircularProgress>
-      </View>
-    </View>
+    </ScrollView>
   );
 };
 
